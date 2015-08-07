@@ -11,4 +11,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("The Open Toolkit Library")]
 [assembly: AssemblyCopyright("Copyright © 2006 - 2014 the Open Toolkit Library")]
 [assembly: AssemblyTrademark("OpenTK")]
-[assembly: AssemblyVersion("1.1.3")]
+[assembly: AssemblyVersion("1.1.4")]
