@@ -92,7 +92,7 @@
     <DefineConstants>TRACE;</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\OpenTK.snk</AssemblyOriginatorKeyFile>
@@ -172,9 +172,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="XmlSpecReader.cs" />
-    <None Include="..\..\OpenTK.snk">
-      <Link>OpenTK.snk</Link>
-    </None>
     <None Include="Specifications\GL2\gl.tm" />
     <None Include="Specifications\Glx\glx.spec">
     </None>

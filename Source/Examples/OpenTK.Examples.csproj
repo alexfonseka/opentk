@@ -98,7 +98,7 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\OpenTK.snk</AssemblyOriginatorKeyFile>
@@ -473,9 +473,6 @@
     <Compile Include="OpenTK\Test\Extensions.Designer.cs">
       <DependentUpon>Extensions.cs</DependentUpon>
     </Compile>
-    <None Include="..\..\OpenTK.snk">
-      <Link>OpenTK.snk</Link>
-    </None>
     <None Include="app.manifest" />
     <None Include="Data\Poem.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

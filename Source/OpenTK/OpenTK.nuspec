@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>AdamsLair.OpenTK</id>
+    <version>$version$</version>
+	<authors>See original project authors</authors>
+    <title>AdamsLair.OpenTK</title>
+    <projectUrl>https://github.com/AdamsLair/opentk</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A custom version of OpenTK for being used with the Duality framework. Forked from https://github.com/opentk/opentk</description>
+  </metadata>
+  <files>
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll" target="lib" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll.config" target="lib" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.pdb" target="lib" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.xml" target="lib" />
+  </files>
+</package>

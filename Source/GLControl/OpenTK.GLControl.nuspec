@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>AdamsLair.OpenTK.GLControl</id>
+    <version>$version$</version>
+	<authors>See original project authors</authors>
+    <title>AdamsLair.OpenTK.GLControl</title>
+    <projectUrl>https://github.com/AdamsLair/opentk</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A custom version of OpenTK for being used with the Duality framework. Forked from https://github.com/opentk/opentk</description>
+  </metadata>
+  <files>
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.GLControl.dll" target="lib" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.GLControl.xml" target="lib" />
+  </files>
+</package>
