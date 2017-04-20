@@ -14,8 +14,8 @@ del *.nupkg
 .nuget\nuget pack Source\GLControl\OpenTK.GLControl.csproj -Properties Configuration=Release
 
 :: upload the nuget packages
-.nuget\nuget push AdamsLair.OpenTK.*.nupkg
-.nuget\nuget push AdamsLair.OpenTK.GLControl.*.nupkg
+.nuget\nuget push AdamsLair.OpenTK.*.nupkg -Source "https://nuget.org"
+.nuget\nuget push AdamsLair.OpenTK.GLControl.*.nupkg -Source "https://nuget.org"
 
 :: remove nupkg files after uploading them
 del *.nupkg
