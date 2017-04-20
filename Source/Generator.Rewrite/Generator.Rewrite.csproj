@@ -73,7 +73,7 @@
     <Commandlineparameters>../../OpenTK/Release/OpenTK.dll ../../../OpenTK.snk</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\OpenTK.snk</AssemblyOriginatorKeyFile>
