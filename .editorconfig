@@ -1,0 +1,8 @@
+# More info at: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+indent_style = space
