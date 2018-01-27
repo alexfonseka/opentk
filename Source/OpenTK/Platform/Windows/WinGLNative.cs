@@ -1062,7 +1062,7 @@ namespace OpenTK.Platform.Windows
             set
             {
                 WindowStyle style = (WindowStyle)Functions.GetWindowLong(window.Handle, GetWindowLongOffsets.STYLE);
-                Win32Rectangle rect = Win32Rectangle.From(bounds);
+                Win32Rectangle rect = Win32Rectangle.From(value);
                 Functions.AdjustWindowRect(ref rect, style, false);
                 Size = new Size(rect.Width, rect.Height);
             }
@@ -1455,7 +1455,7 @@ namespace OpenTK.Platform.Windows
 
                 // Make sure client size doesn't change when changing the border style.
                 Size client_size = ClientSize;
-                Win32Rectangle rect = Win32Rectangle.From(client_size);
+                Win32Rectangle rect = Win32Rectangle.From(bounds);
                 Functions.AdjustWindowRectEx(ref rect, new_style, false, ParentStyleEx);
 
                 // This avoids leaving garbage on the background window.
