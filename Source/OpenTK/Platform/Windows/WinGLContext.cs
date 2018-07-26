@@ -227,15 +227,15 @@ namespace OpenTK.Platform.Windows
         static ArbCreateContext GetARBContextFlags(GraphicsContextFlags flags)
         {
             ArbCreateContext result = 0;
-            result |= (flags & GraphicsContextFlags.ForwardCompatible) != 0 ?
-                ArbCreateContext.CoreProfileBit : ArbCreateContext.CompatibilityProfileBit;
+            result |= (flags & GraphicsContextFlags.Debug) != 0 ? ArbCreateContext.DebugBit : 0;
             return result;
         }
 
         static ArbCreateContext GetARBContextProfile(GraphicsContextFlags flags)
         {
             ArbCreateContext result = 0;
-            result |= (flags & GraphicsContextFlags.Debug) != 0 ? ArbCreateContext.DebugBit : 0;
+            result |= (flags & GraphicsContextFlags.ForwardCompatible) != 0 ?
+                ArbCreateContext.CoreProfileBit : ArbCreateContext.CompatibilityProfileBit;
             return result;
         }
 
