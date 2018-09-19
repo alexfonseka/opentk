@@ -167,10 +167,10 @@ namespace OpenTK.Input
             switch (item[0])
             {
                 case 'a':
-                    return new GamePadConfigurationSource(ParseAxis(item));
+                    return new GamePadConfigurationSource(isAxis:true, index:ParseIndex(item));
 
                 case 'b':
-                    return new GamePadConfigurationSource(ParseButton(item));
+                    return new GamePadConfigurationSource(isAxis:false, index:ParseIndex(item));
 
                 case 'h':
                     {
@@ -184,20 +184,16 @@ namespace OpenTK.Input
             }
         }
 
-        static JoystickAxis ParseAxis(string item)
+        /// <summary>
+        /// Parses a string in the format a#" where:
+        /// - # is a zero-based integer number
+        /// </summary>
+        /// <param name="item">The string to parse</param>
+        /// <returns>The index of the axis or button</returns>
+       private static int ParseIndex(string item)
         {
             // item is in the format "a#" where # a zero-based integer number
-            JoystickAxis axis = JoystickAxis.Axis0;
-            int id = Int32.Parse(item.Substring(1));
-            return axis + id;
-        }
-
-        static JoystickButton ParseButton(string item)
-        {
-            // item is in the format "b#" where # a zero-based integer number
-            JoystickButton button = JoystickButton.Button0;
-            int id = Int32.Parse(item.Substring(1));
-            return button + id;
+            return Int32.Parse(item.Substring(1)); ;
         }
 
         /// <summary>

@@ -38,8 +38,8 @@ namespace OpenTK.Input
     {
         // If we ever add more values to JoystickAxis or JoystickButton
         // then we'll need to increase these limits.
-        internal const int MaxAxes = (int)JoystickAxis.Last + 1;
-        internal const int MaxButtons = (int)JoystickButton.Last + 1;
+        internal const int MaxAxes = 64;
+        internal const int MaxButtons = 64;
         internal const int MaxHats = (int)JoystickHat.Last + 1;
 
         private const float ConversionFactor = 1.0f / (short.MaxValue + 0.5f);
@@ -59,8 +59,8 @@ namespace OpenTK.Input
         /// If the specified axis does not exist, then the return value is 0.0. Use <see cref="Joystick.GetCapabilities"/>
         /// to query the number of available axes.
         /// </returns>
-        /// <param name="axis">The <see cref="JoystickAxis"/> to query.</param>
-        public float GetAxis(JoystickAxis axis)
+        /// <param name="axis">The axis to query.</param>
+        public float GetAxis(int axis)
         {
             return GetAxisRaw(axis) * ConversionFactor;
         }
@@ -69,10 +69,10 @@ namespace OpenTK.Input
         /// Gets the current <see cref="ButtonState"/> of the specified button.
         /// </summary>
         /// <returns><see cref="ButtonState.Pressed"/> if the specified button is pressed; otherwise, <see cref="ButtonState.Released"/>.</returns>
-        /// <param name="button">The <see cref="JoystickButton"/> to query.</param>
-        public ButtonState GetButton(JoystickButton button)
+        /// <param name="button">The button to query.</param>
+        public ButtonState GetButton(int button)
         {
-            return (buttons & (1 << (int)button)) != 0 ? ButtonState.Pressed : ButtonState.Released;
+            return (buttons & ((long)1 << button)) != 0 ? ButtonState.Pressed : ButtonState.Released;
         }
 
         /// <summary>
@@ -101,20 +101,20 @@ namespace OpenTK.Input
         /// Gets a value indicating whether the specified button is currently pressed.
         /// </summary>
         /// <returns>true if the specified button is pressed; otherwise, false.</returns>
-        /// <param name="button">The <see cref="JoystickButton"/> to query.</param>
-        public bool IsButtonDown(JoystickButton button)
+        /// <param name="button">The button to query.</param>
+        public bool IsButtonDown(int button)
         {
-            return (buttons & (1 << (int)button)) != 0;
+            return (buttons & ((long)1 << button)) != 0;
         }
 
         /// <summary>
         /// Gets a value indicating whether the specified button is currently released.
         /// </summary>
         /// <returns>true if the specified button is released; otherwise, false.</returns>
-        /// <param name="button">The <see cref="JoystickButton"/> to query.</param>
-        public bool IsButtonUp(JoystickButton button)
+        /// <param name="button">The button to query.</param>
+        public bool IsButtonUp(int button)
         {
-            return (buttons & (1 << (int)button)) == 0;
+            return (buttons & ((long)1 << button)) == 0;
         }
 
         /// <summary>
@@ -146,12 +146,12 @@ namespace OpenTK.Input
             for (int i = 0; i < MaxAxes; i++)
             {
                 sb.Append(" ");
-                sb.Append(String.Format("{0:f4}", GetAxis(JoystickAxis.Axis0 + i)));
+                sb.Append(String.Format("{0:f4}", GetAxis(i)));
             }
             return String.Format(
                 "{{Axes:{0}; Buttons: {1}; Hat: {2}; IsConnected: {3}}}",
                 sb.ToString(),
-                Convert.ToString((int)buttons, 2).PadLeft(16, '0'),
+                Convert.ToString(buttons, 2).PadLeft(16, '0'),
                 hat0,
                 IsConnected);
         }
@@ -186,11 +186,6 @@ namespace OpenTK.Input
 
         internal int PacketNumber { get; private set; }
 
-        internal short GetAxisRaw(JoystickAxis axis)
-        {
-            return GetAxisRaw((int)axis);
-        }
-
         internal short GetAxisRaw(int axis)
         {
             short value = 0;
@@ -205,11 +200,13 @@ namespace OpenTK.Input
             return value;
         }
 
-        internal void SetAxis(JoystickAxis axis, short value)
+        internal void SetAxis(int axis, short value)
         {
-            int index = (int)axis;
+            int index = axis;
             if (index < 0 || index >= MaxAxes)
+            {
                 throw new ArgumentOutOfRangeException("axis");
+            }
 
             unsafe
             {
@@ -225,19 +222,20 @@ namespace OpenTK.Input
             buttons = 0;
         }
 
-        internal void SetButton(JoystickButton button, bool value)
+        internal void SetButton(int button, bool value)
         {
-            int index = (int)button;
-            if (index < 0 || index >= MaxButtons)
+            if (button < 0 || button >= MaxButtons)
+            {
                 throw new ArgumentOutOfRangeException("button");
+            }
 
             if (value)
             {
-                buttons |= 1 << index;
+                buttons |= (long)1 << button;
             }
             else
             {
-                buttons &= ~(1 << index);
+                buttons &= ~((long)1 << button);
             }
         }
 
@@ -272,9 +270,7 @@ namespace OpenTK.Input
             PacketNumber = number;
         }
 
-        #region Private Members
-
-        short GetAxisUnsafe(int index)
+        private short GetAxisUnsafe(int index)
         {
             unsafe
             {
@@ -284,10 +280,6 @@ namespace OpenTK.Input
                 }
             }
         }
-
-        #endregion
-
-        #region IEquatable<JoystickState> Members
 
         /// <summary>
         /// Determines whether the specified <see cref="OpenTK.Input.JoystickState"/> is equal to the current <see cref="OpenTK.Input.JoystickState"/>.
@@ -311,7 +303,5 @@ namespace OpenTK.Input
             }
             return equals;
         }
-
-        #endregion
     }
 }

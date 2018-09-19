@@ -50,13 +50,14 @@ namespace OpenTK.Platform.Windows
             internal readonly bool IsXInput;
             internal readonly int XInputIndex;
 
-            readonly Dictionary<int, JoystickAxis> axes =
-                new Dictionary<int,JoystickAxis>();
-            readonly Dictionary<int, JoystickButton> buttons =
-                new Dictionary<int, JoystickButton>();
-            readonly Dictionary<int, JoystickHat> hats =
-                new Dictionary<int, JoystickHat>();
+            private readonly Dictionary<int, int> axes =
+                new Dictionary<int, int>();
 
+            private readonly Dictionary<int, int> buttons =
+                new Dictionary<int, int>();
+
+            private readonly Dictionary<int, JoystickHat> hats =
+                new Dictionary<int, JoystickHat>();
 
             public Device(IntPtr handle, Guid guid, bool is_xinput, int xinput_index)
             {
@@ -75,14 +76,19 @@ namespace OpenTK.Platform.Windows
             {
                 if (page == HIDPage.GenericDesktop || page == HIDPage.Simulation) // set axis only when HIDPage is known by HidHelper.TranslateJoystickAxis() to avoid axis0 to be overwritten by unknown HIDPage
                 {
-                    JoystickAxis axis = GetAxis(collection, page, usage);
-                    State.SetAxis(axis, value);
+                    //Certain joysticks (Speedlink Black Widow, PS3 pad connected via USB)
+                    //return an invalid HID page of 1, so
+                    if ((int)usage != 1)
+                    {
+                        int axis = GetAxis(collection, page, usage);
+                        State.SetAxis(axis, value);
+                    }
                 }
             }
 
             public void SetButton(short collection, HIDPage page, short usage, bool value)
             {
-                JoystickButton button = GetButton(collection, page, usage);
+                int button = GetButton(collection, page, usage);
                 State.SetButton(button, value);
             }
 
@@ -128,23 +134,23 @@ namespace OpenTK.Platform.Windows
                 return (coll_byte << 24) | (page_byte << 16) | unchecked((ushort)usage);
             }
 
-            JoystickAxis GetAxis(short collection, HIDPage page, short usage)
+            private int GetAxis(short collection, HIDPage page, short usage)
             {
                 int key = MakeKey(collection, page, usage);
                 if (!axes.ContainsKey(key))
                 {
-                    JoystickAxis axis = HidHelper.TranslateJoystickAxis(page, usage);
+                    int axis = HidHelper.TranslateJoystickAxis(page, usage);
                     axes.Add(key, axis);
                 }
                 return axes[key];
             }
 
-            JoystickButton GetButton(short collection, HIDPage page, short usage)
+            private int GetButton(short collection, HIDPage page, short usage)
             {
                 int key = MakeKey(collection, page, usage);
                 if (!buttons.ContainsKey(key))
                 {
-                    buttons.Add(key, JoystickButton.Button0 + buttons.Count);
+                    buttons.Add(key, buttons.Count);
                 }
                 return buttons[key];
             }
@@ -403,8 +409,8 @@ namespace OpenTK.Platform.Windows
 
             for (int i = 0; i < stick.ButtonCaps.Count; i++)
             {
-                short* usage_list = stackalloc short[(int)JoystickButton.Last + 1];
-                int usage_length = (int)JoystickButton.Last;
+                short* usage_list = stackalloc short[64];
+                int usage_length = 64;
                 HIDPage page = stick.ButtonCaps[i].UsagePage;
                 short collection = stick.ButtonCaps[i].LinkCollection;
 
@@ -513,7 +519,7 @@ namespace OpenTK.Platform.Windows
                                     case HIDUsageGD.Dial:
                                     case HIDUsageGD.Wheel:
                                         Debug.Print("Found axis {0} ({1} / {2})",
-                                            JoystickAxis.Axis0 + stick.GetCapabilities().AxisCount,
+                                            stick.GetCapabilities().AxisCount,
                                             page, (HIDUsageGD)stick.AxisCaps[i].NotRange.Usage);
                                         stick.SetAxis(collection, page, stick.AxisCaps[i].NotRange.Usage, 0);
                                         break;
@@ -538,7 +544,7 @@ namespace OpenTK.Platform.Windows
                                     case HIDUsageSim.Rudder:
                                     case HIDUsageSim.Throttle:
                                         Debug.Print("Found simulation axis {0} ({1} / {2})",
-                                            JoystickAxis.Axis0 + stick.GetCapabilities().AxisCount,
+                                            stick.GetCapabilities().AxisCount,
                                             page, (HIDUsageSim)stick.AxisCaps[i].NotRange.Usage);
                                         stick.SetAxis(collection, page, stick.AxisCaps[i].NotRange.Usage, 0);
                                         break;
@@ -575,7 +581,7 @@ namespace OpenTK.Platform.Windows
                                     for (short usage = stick.ButtonCaps[i].Range.UsageMin; usage <= stick.ButtonCaps[i].Range.UsageMax; usage++)
                                     {
                                         Debug.Print("Found button {0} ({1} / {2})",
-                                            JoystickButton.Button0 + stick.GetCapabilities().ButtonCount,
+                                            stick.GetCapabilities().ButtonCount,
                                             page, usage);
                                         stick.SetButton(collection, page, usage, false);
                                     }
@@ -583,7 +589,7 @@ namespace OpenTK.Platform.Windows
                                 else
                                 {
                                     Debug.Print("Found button {0} ({1} / {2})",
-                                        JoystickButton.Button0 + stick.GetCapabilities().ButtonCount,
+                                        stick.GetCapabilities().ButtonCount,
                                         page, stick.ButtonCaps[i].NotRange.Usage);
                                     stick.SetButton(collection, page, stick.ButtonCaps[i].NotRange.Usage, false);
                                 }
