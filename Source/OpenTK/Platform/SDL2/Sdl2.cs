@@ -1,4 +1,3 @@
-#region License
 //
 // The Open Toolkit Library License
 //
@@ -6,7 +5,7 @@
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights to 
+// in the Software without restriction, including without limitation the rights to
 // use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 // the Software, and to permit persons to whom the Software is furnished to do
 // so, subject to the following conditions:
@@ -24,8 +23,6 @@
 // OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#endregion
-
 using System;
 using System.Diagnostics;
 using System.Security;
@@ -38,18 +35,18 @@ namespace OpenTK.Platform.SDL2
     using Surface = IntPtr;
     using Cursor = IntPtr;
 
-    partial class SDL
+    internal partial class SDL
     {
         #if ANDROID
         const string lib = "libSDL2.so";
         #elif IPHONE
         const string lib = "__Internal";
         #else
-        const string lib = "SDL2.dll";
+        private const string lib = "SDL2.dll";
         #endif
 
         public readonly static object Sync = new object();
-        static Nullable<Version> version;
+        private static Nullable<Version> version;
         public static Version Version
         {
             get
@@ -71,17 +68,13 @@ namespace OpenTK.Platform.SDL2
             }
         }
 
-        #region Functions
-
-        static string IntPtrToString(IntPtr ptr)
+        private static string IntPtrToString(IntPtr ptr)
         {
             return Marshal.PtrToStringAnsi(ptr);
             //int strlen = 0;
             //while (Marshal.ReadByte(ptr) != 0)
             //    strlen++;
         }
-
-        #region Cursor
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateColorCursor", ExactSpelling = true)]
@@ -98,8 +91,6 @@ namespace OpenTK.Platform.SDL2
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_SetCursor", ExactSpelling = true)]
         public static extern void SetCursor(Cursor cursor);
-
-        #endregion
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_AddEventWatch", ExactSpelling = true)]
@@ -139,7 +130,6 @@ namespace OpenTK.Platform.SDL2
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_FreeSurface", ExactSpelling = true)]
         public static extern void FreeSurface(IntPtr surface);
 
-        #region GameContoller
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerEventState", ExactSpelling = true)]
@@ -195,7 +185,7 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerName", ExactSpelling = true)]
-        static extern IntPtr GameControllerNameInternal(IntPtr gamecontroller);
+        private static extern IntPtr GameControllerNameInternal(IntPtr gamecontroller);
 
         /// <summary>
         /// Return the name for an openend game controller instance.
@@ -222,8 +212,6 @@ namespace OpenTK.Platform.SDL2
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GameControllerOpen", ExactSpelling = true)]
         public static extern IntPtr GameControllerOpen(int joystick_index);
 
-        #endregion
-
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetDisplayBounds", ExactSpelling = true)]
         public static extern int GetDisplayBounds(int displayIndex, out Rect rect);
@@ -234,7 +222,7 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetError", ExactSpelling = true)]
-        static extern IntPtr GetErrorInternal();
+        private static extern IntPtr GetErrorInternal();
         public static string GetError()
         {
             return IntPtrToString(GetErrorInternal());
@@ -284,7 +272,7 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowTitle", ExactSpelling = true)]
-        static extern IntPtr GetWindowTitlePrivate(IntPtr window);
+        private static extern IntPtr GetWindowTitlePrivate(IntPtr window);
         public static string GetWindowTitle(IntPtr window)
         {
             return Marshal.PtrToStringAnsi(GetWindowTitlePrivate(window));
@@ -333,7 +321,7 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickName", ExactSpelling = true)]
-        static extern IntPtr JoystickNameInternal(IntPtr joystick);
+        private static extern IntPtr JoystickNameInternal(IntPtr joystick);
         public static string JoystickName(IntPtr joystick)
         {
             unsafe
@@ -392,9 +380,13 @@ namespace OpenTK.Platform.SDL2
         public static int PeepEvents(Event[] e, int count, EventAction action, EventType min, EventType max)
         {
             if (e == null)
+            {
                 throw new ArgumentNullException();
+            }
             if (count <= 0 || count > e.Length)
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
             unsafe
             {
@@ -407,12 +399,12 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PeepEvents", ExactSpelling = true)]
-        unsafe static extern int PeepEvents(Event* e, int count, EventAction action, EventType min, EventType max);
+        private unsafe static extern int PeepEvents(Event* e, int count, EventAction action, EventType min, EventType max);
 
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_PixelFormatEnumToMasks", ExactSpelling = true)]
-        public static extern bool PixelFormatEnumToMasks(uint format, out int bpp, 
+        public static extern bool PixelFormatEnumToMasks(uint format, out int bpp,
             out uint rmask, out uint gmask, out uint bmask, out uint amask);
 
         [SuppressUnmanagedCodeSecurity]
@@ -483,7 +475,6 @@ namespace OpenTK.Platform.SDL2
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_WarpMouseInWindow", ExactSpelling = true)]
         public static extern void WarpMouseInWindow(IntPtr window, int x, int y);
 
-        #region SysWM
 
         /// <summary>
         /// Retrieves driver-dependent window information.
@@ -507,9 +498,7 @@ namespace OpenTK.Platform.SDL2
 
         [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GetWindowWMInfo", ExactSpelling = true)]
-        static extern bool GetWindowWMInfoInternal(IntPtr window, ref SysWMInfo info);
-
-        #endregion
+        private static extern bool GetWindowWMInfoInternal(IntPtr window, ref SysWMInfo info);
 
         public partial class GL
         {
@@ -577,20 +566,12 @@ namespace OpenTK.Platform.SDL2
             [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SwapWindow", ExactSpelling = true)]
             public static extern void SwapWindow(IntPtr window);
         }
-
-        #endregion
     }
-
-    #region Delegates
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate int EventFilter(IntPtr userdata, IntPtr @event);
 
-    #endregion
-
-    #region Enums
-
-    enum Button : byte
+    internal enum Button : byte
     {
         Left = 1,
         Middle,
@@ -600,7 +581,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [Flags]
-    enum ButtonFlags
+    internal enum ButtonFlags
     {
         Left = 1 << (Button.Left - 1),
         Middle = 1 << (Button.Middle - 1),
@@ -609,7 +590,7 @@ namespace OpenTK.Platform.SDL2
         X2 = 1 << (Button.X2 - 1),
     }
 
-    enum ContextAttribute
+    internal enum ContextAttribute
     {
         RED_SIZE,
         GREEN_SIZE,
@@ -637,7 +618,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [Flags]
-    enum ContextFlags
+    internal enum ContextFlags
     {
         DEBUG = 0x0001,
         FORWARD_COMPATIBLE = 0x0002,
@@ -646,28 +627,28 @@ namespace OpenTK.Platform.SDL2
     }
 
     [Flags]
-    enum ContextProfileFlags
+    internal enum ContextProfileFlags
     {
         CORE = 0x0001,
         COMPATIBILITY = 0x0002,
         ES = 0x0004
     }
 
-    enum EventAction
+    internal enum EventAction
     {
         Add,
         Peek,
         Get
     }
 
-    enum EventState
+    internal enum EventState
     {
         Query = -1,
         Ignore = 0,
         Enable = 1
     }
 
-    enum EventType
+    internal enum EventType
     {
         FIRSTEVENT = 0,
         QUIT = 0x100,
@@ -706,7 +687,7 @@ namespace OpenTK.Platform.SDL2
         LASTEVENT = 0xFFFF
     }
 
-    enum GameControllerAxis : byte
+    internal enum GameControllerAxis : byte
     {
         Invalid = 0xff,
         LeftX = 0,
@@ -718,7 +699,7 @@ namespace OpenTK.Platform.SDL2
         Max
     }
 
-    enum GameControllerButton : byte
+    internal enum GameControllerButton : byte
     {
         INVALID = 0xff,
         A = 0,
@@ -739,7 +720,7 @@ namespace OpenTK.Platform.SDL2
         Max
     }
 
-    enum GameControllerBindType : byte
+    internal enum GameControllerBindType : byte
     {
         None = 0,
         Button,
@@ -748,7 +729,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [Flags]
-    enum HatPosition : byte
+    internal enum HatPosition : byte
     {
         Centered = 0x00,
         Up = 0x01,
@@ -761,7 +742,7 @@ namespace OpenTK.Platform.SDL2
         LeftDown = Left | Down
     }
 
-    enum Keycode
+    internal enum Keycode
     {
         UNKNOWN = 0,
         RETURN = '\r',
@@ -1002,7 +983,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [Flags]
-    enum Keymod : ushort
+    internal enum Keymod : ushort
     {
         NONE = 0x0000,
         LSHIFT = 0x0001,
@@ -1023,7 +1004,7 @@ namespace OpenTK.Platform.SDL2
         GUI = (LGUI | RGUI)
     }
 
-    enum Scancode
+    internal enum Scancode
     {
         UNKNOWN = 0,
         A = 4,
@@ -1277,14 +1258,14 @@ namespace OpenTK.Platform.SDL2
         SDL_NUM_SCANCODES = 512
     }
 
-    enum State : byte
+    internal enum State : byte
     {
         Released = 0,
         Pressed = 1
     }
 
     [Flags]
-    enum SystemFlags : uint
+    internal enum SystemFlags : uint
     {
         Default = 0,
         TIMER = 0x00000001,
@@ -1298,7 +1279,7 @@ namespace OpenTK.Platform.SDL2
             JOYSTICK | HAPTIC | GAMECONTROLLER
     }
 
-    enum SysWMType
+    internal enum SysWMType
     {
         Unknown = 0,
         Windows,
@@ -1309,7 +1290,7 @@ namespace OpenTK.Platform.SDL2
         UIKit,
     }
 
-    enum WindowEventID : byte
+    internal enum WindowEventID : byte
     {
         NONE,
         SHOWN,
@@ -1328,7 +1309,7 @@ namespace OpenTK.Platform.SDL2
         CLOSE,
     }
 
-    enum WindowFlags
+    internal enum WindowFlags
     {
         Default = 0,
         FULLSCREEN = 0x00000001,
@@ -1347,35 +1328,31 @@ namespace OpenTK.Platform.SDL2
         ALLOW_HIGHDPI = 0x00002000,
     }
 
-    #endregion
-
-    #region Structs
-
-    struct ControllerAxisEvent
+    internal struct ControllerAxisEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
         public GameControllerAxis Axis;
-        byte padding1;
-        byte padding2;
-        byte padding3;
+        private byte padding1;
+        private byte padding2;
+        private byte padding3;
         public short Value;
-        ushort padding4;
+        private ushort padding4;
     }
 
-    struct ControllerButtonEvent
+    internal struct ControllerButtonEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
         public GameControllerButton Button;
         public State State;
-        byte padding1;
-        byte padding2;
+        private byte padding1;
+        private byte padding2;
     }
 
-    struct ControllerDeviceEvent
+    internal struct ControllerDeviceEvent
     {
         public EventType Type;
         public uint Timestamp;
@@ -1386,7 +1363,7 @@ namespace OpenTK.Platform.SDL2
         public int Which;
     }
 
-    struct DisplayMode
+    internal struct DisplayMode
     {
         public uint Format;
         public int Width;
@@ -1396,7 +1373,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    struct Event
+    internal struct Event
     {
         [FieldOffset(0)]
         public EventType Type;
@@ -1456,7 +1433,7 @@ namespace OpenTK.Platform.SDL2
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    struct GameControllerButtonBind
+    internal struct GameControllerButtonBind
     {
         [FieldOffset(0)]
         public GameControllerBindType BindType;
@@ -1470,65 +1447,65 @@ namespace OpenTK.Platform.SDL2
         public int HatMask;
     }
 
-    struct JoyAxisEvent
+    internal struct JoyAxisEvent
     {
         public EventType Type;
         public UInt32 Timestamp;
         public Int32 Which; // SDL_JoystickID
         public byte Axis;
-        byte padding1;
-        byte padding2;
-        byte padding3;
+        private byte padding1;
+        private byte padding2;
+        private byte padding3;
         public Int16 Value;
-        UInt16 padding4;
+        private UInt16 padding4;
     }
 
-    struct JoyBallEvent
+    internal struct JoyBallEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
         public byte Ball;
-        byte padding1;
-        byte padding2;
-        byte padding3;
+        private byte padding1;
+        private byte padding2;
+        private byte padding3;
         public short Xrel;
         public short Yrel;
     }
 
-    struct JoyButtonEvent
+    internal struct JoyButtonEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
         public byte Button;
         public State State;
-        byte padding1;
-        byte padding2;
+        private byte padding1;
+        private byte padding2;
     }
 
-    struct JoyDeviceEvent
+    internal struct JoyDeviceEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
     }
 
-    struct JoyHatEvent
+    internal struct JoyHatEvent
     {
         public EventType Type;
         public uint Timestamp;
         public int Which;
         public byte Hat;
         public HatPosition Value;
-        byte padding1;
-        byte padding2;
+        private byte padding1;
+        private byte padding2;
     }
 
-    struct JoystickGuid
+    internal struct JoystickGuid
     {
-        long data0;
-        long data1;
+        private long data0;
+        private long data1;
 
         public Guid ToGuid()
         {
@@ -1538,7 +1515,7 @@ namespace OpenTK.Platform.SDL2
             {
                 fixed (JoystickGuid* pdata = &this)
                 {
-                    Marshal.Copy(new IntPtr(pdata), data, 0, data.Length); 
+                    Marshal.Copy(new IntPtr(pdata), data, 0, data.Length);
                 }
             }
 
@@ -1556,19 +1533,19 @@ namespace OpenTK.Platform.SDL2
         }
     }
 
-    struct KeyboardEvent
+    internal struct KeyboardEvent
     {
         public EventType Type;
         public uint Timestamp;
         public uint WindowID;
         public State State;
         public byte Repeat;
-        byte padding2;
-        byte padding3;
+        private byte padding2;
+        private byte padding3;
         public Keysym Keysym;
     }
 
-    struct Keysym
+    internal struct Keysym
     {
         public Scancode Scancode;
         public Keycode Sym;
@@ -1577,7 +1554,7 @@ namespace OpenTK.Platform.SDL2
         public uint Unicode;
     }
 
-    struct MouseButtonEvent
+    internal struct MouseButtonEvent
     {
         public EventType Type;
         public UInt32 Timestamp;
@@ -1586,12 +1563,12 @@ namespace OpenTK.Platform.SDL2
         public Button Button;
         public State State;
         public byte Clicks;
-        byte padding1;
+        private byte padding1;
         public Int32 X;
         public Int32 Y;
     }
 
-    struct MouseMotionEvent
+    internal struct MouseMotionEvent
     {
         public EventType Type;
         public uint Timestamp;
@@ -1604,7 +1581,7 @@ namespace OpenTK.Platform.SDL2
         public Int32 Yrel;
     }
 
-    struct MouseWheelEvent
+    internal struct MouseWheelEvent
     {
         public EventType Type;
         public uint Timestamp;
@@ -1629,7 +1606,7 @@ namespace OpenTK.Platform.SDL2
         public const uint TouchMouseID = 0xffffffff;
     }
 
-    struct Rect
+    internal struct Rect
     {
         public int X;
         public int Y;
@@ -1637,7 +1614,7 @@ namespace OpenTK.Platform.SDL2
         public int Height;
     }
 
-    struct SysWMInfo
+    internal struct SysWMInfo
     {
         public Version Version;
         public SysWMType Subsystem;
@@ -1696,7 +1673,7 @@ namespace OpenTK.Platform.SDL2
         }
     }
 
-    struct TextEditingEvent
+    internal struct TextEditingEvent
     {
         public const int TextSize = 32;
 
@@ -1708,7 +1685,7 @@ namespace OpenTK.Platform.SDL2
         public Int32 Length;
     }
 
-    struct TextInputEvent
+    internal struct TextInputEvent
     {
         public const int TextSize = 32;
 
@@ -1718,7 +1695,7 @@ namespace OpenTK.Platform.SDL2
         public unsafe fixed byte Text[TextSize];
     }
 
-    struct Version
+    internal struct Version
     {
         public byte Major;
         public byte Minor;
@@ -1730,19 +1707,28 @@ namespace OpenTK.Platform.SDL2
         }
     }
 
-    struct WindowEvent
+    internal struct WindowEvent
     {
         public EventType Type;
         public UInt32 Timestamp;
         public UInt32 WindowID;
         public WindowEventID Event;
-        byte padding1;
-        byte padding2;
-        byte padding3;
+        private byte padding1;
+        private byte padding2;
+        private byte padding3;
         public Int32 Data1;
         public Int32 Data2;
     }
 
-    #endregion
+    /// <summary>
+    /// Drop event for SDL2 interop. For detailed info look: https://wiki.libsdl.org/SDL_DropEvent
+    /// </summary>
+    internal struct DropEvent
+    {
+        public UInt32 Type;
+        public UInt32 Timestamp;
+        public IntPtr File;
+        public UInt32 WindowID;
+    }
 }
 

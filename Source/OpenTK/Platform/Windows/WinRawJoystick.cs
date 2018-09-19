@@ -1,5 +1,4 @@
-﻿#region License
-//
+﻿//
 // WinRawJoystick.cs
 //
 // Author:
@@ -25,26 +24,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#endregion
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using OpenTK.Input;
 using OpenTK.Platform.Common;
 
 namespace OpenTK.Platform.Windows
 {
-    class WinRawJoystick : IJoystickDriver2
+    internal class WinRawJoystick : IJoystickDriver2
     {
-        class Device
+        private class Device
         {
             public IntPtr Handle;
-            JoystickCapabilities Capabilities;
-            JoystickState State;
-            Guid Guid;
+            private JoystickCapabilities Capabilities;
+            private JoystickState State;
+            private Guid Guid;
 
             internal readonly List<HidProtocolValueCaps> AxisCaps =
                 new List<HidProtocolValueCaps>();
@@ -60,7 +57,6 @@ namespace OpenTK.Platform.Windows
             readonly Dictionary<int, JoystickHat> hats =
                 new Dictionary<int, JoystickHat>();
 
-            #region Constructors
 
             public Device(IntPtr handle, Guid guid, bool is_xinput, int xinput_index)
             {
@@ -69,10 +65,6 @@ namespace OpenTK.Platform.Windows
                 IsXInput = is_xinput;
                 XInputIndex = xinput_index;
             }
-
-            #endregion
-
-            #region Public Members
 
             public void ClearButtons()
             {
@@ -129,11 +121,7 @@ namespace OpenTK.Platform.Windows
                 return State;
             }
 
-            #endregion
-
-            #region Private Members
-
-            static int MakeKey(short collection, HIDPage page, short usage)
+            private static int MakeKey(short collection, HIDPage page, short usage)
             {
                 byte coll_byte = unchecked((byte)collection);
                 byte page_byte = unchecked((byte)(((ushort)page & 0xff00) >> 8 | ((ushort)page & 0xff)));
@@ -161,7 +149,7 @@ namespace OpenTK.Platform.Windows
                 return buttons[key];
             }
 
-            JoystickHat GetHat(short collection, HIDPage page, short usage)
+            private JoystickHat GetHat(short collection, HIDPage page, short usage)
             {
                 int key = MakeKey(collection, page, usage);
                 if (!hats.ContainsKey(key))
@@ -170,23 +158,21 @@ namespace OpenTK.Platform.Windows
                 }
                 return hats[key];
             }
-
-            #endregion
         }
 
-        static readonly string TypeName = typeof(WinRawJoystick).Name;
+        private static readonly string TypeName = typeof(WinRawJoystick).Name;
 
-        XInputJoystick XInput = new XInputJoystick();
+        private XInputJoystick XInput = new XInputJoystick();
 
         // Defines which types of HID devices we are interested in
-        readonly RawInputDevice[] DeviceTypes;
+        private readonly RawInputDevice[] DeviceTypes;
 
-        readonly object UpdateLock = new object();
-        readonly DeviceCollection<Device> Devices = new DeviceCollection<Device>();
+        private readonly object UpdateLock = new object();
+        private readonly DeviceCollection<Device> Devices = new DeviceCollection<Device>();
 
-        byte[] HIDData = new byte[1024];
-        byte[] PreparsedData = new byte[1024];
-        HidProtocolData[] DataBuffer = new HidProtocolData[16];
+        private byte[] HIDData = new byte[1024];
+        private byte[] PreparsedData = new byte[1024];
+        private HidProtocolData[] DataBuffer = new HidProtocolData[16];
 
         public WinRawJoystick(IntPtr window)
         {
@@ -194,7 +180,9 @@ namespace OpenTK.Platform.Windows
             Debug.Indent();
 
             if (window == IntPtr.Zero)
+            {
                 throw new ArgumentNullException("window");
+            }
 
             DeviceTypes = new RawInputDevice[]
             {
@@ -217,8 +205,6 @@ namespace OpenTK.Platform.Windows
             Debug.Unindent();
         }
 
-        #region Public Members
-
         public void RefreshDevices()
         {
             // Mark all devices as disconnected. We will check which of those
@@ -234,7 +220,9 @@ namespace OpenTK.Platform.Windows
             {
                 // Skip non-joystick devices
                 if (dev.Type != RawInputDeviceType.HID)
+                {
                     continue;
+                }
 
                 // We use the device handle as the hardware id.
                 // This works, but the handle will change whenever the
@@ -350,7 +338,7 @@ namespace OpenTK.Platform.Windows
             return false;
         }
 
-        HatPosition GetHatPosition(uint value, HidProtocolValueCaps caps)
+        private HatPosition GetHatPosition(uint value, HidProtocolValueCaps caps)
         {
             if (caps.LogicalMax == 8)
                 return (HatPosition)value;
@@ -364,13 +352,13 @@ namespace OpenTK.Platform.Windows
                 return HatPosition.Centered;
         }
 
-        unsafe void UpdateAxes(RawInput* rin, Device stick)
+        private unsafe void UpdateAxes(RawInput* rin, Device stick)
         {
             for (int i = 0; i < stick.AxisCaps.Count; i++)
             {
                 if (stick.AxisCaps[i].IsRange)
                 {
-                    Debug.Print("[{0}] Axis range collections not implemented. Please report your controller type at http://www.opentk.com",
+                    Debug.Print("[{0}] Axis range collections not implemented. Please report your controller type at https://github.com/opentk/opentk/issues",
                         GetType().Name);
                     continue;
                 }
@@ -409,7 +397,7 @@ namespace OpenTK.Platform.Windows
             }
         }
 
-        unsafe void UpdateButtons(RawInput* rin, Device stick)
+        private unsafe void UpdateButtons(RawInput* rin, Device stick)
         {
             stick.ClearButtons();
 
@@ -442,11 +430,7 @@ namespace OpenTK.Platform.Windows
             }
         }
 
-        #endregion
-
-        #region Private Members
-
-        static bool GetPreparsedData(IntPtr handle, ref byte[] prepared_data)
+        private static bool GetPreparsedData(IntPtr handle, ref byte[] prepared_data)
         {
             // Query the size of the _HIDP_PREPARSED_DATA structure for this event.
             int preparsed_size = 0;
@@ -477,7 +461,7 @@ namespace OpenTK.Platform.Windows
             return true;
         }
 
-        bool QueryDeviceCaps(Device stick)
+        private bool QueryDeviceCaps(Device stick)
         {
             Debug.Print("[{0}] Querying joystick {1}",
                 TypeName, stick.GetGuid());
@@ -612,7 +596,9 @@ namespace OpenTK.Platform.Windows
                     }
                 }
                 else
+                {
                     return false;
+                }
             }
             finally
             {
@@ -622,7 +608,7 @@ namespace OpenTK.Platform.Windows
             return true;
         }
 
-        static bool GetDeviceCaps(Device stick, byte[] preparsed_data, out HidProtocolCaps caps)
+        private static bool GetDeviceCaps(Device stick, byte[] preparsed_data, out HidProtocolCaps caps)
         {
             // Query joystick capabilities
             caps = new HidProtocolCaps();
@@ -670,7 +656,7 @@ namespace OpenTK.Platform.Windows
 
         // Get a DirectInput-compatible Guid
         // (equivalent to DIDEVICEINSTANCE guidProduct field)
-        Guid GetDeviceGuid(IntPtr handle)
+        private Guid GetDeviceGuid(IntPtr handle)
         {
             // Retrieve a RID_DEVICE_INFO struct which contains the VID and PID
             RawInputDeviceInfo info = new RawInputDeviceInfo();
@@ -700,7 +686,7 @@ namespace OpenTK.Platform.Windows
         // Checks whether this is an XInput device.
         // XInput devices should be handled through
         // the XInput API.
-        bool IsXInput(IntPtr handle)
+        private bool IsXInput(IntPtr handle)
         {
             bool is_xinput = false;
 
@@ -739,7 +725,7 @@ namespace OpenTK.Platform.Windows
             return is_xinput;
         }
 
-        Device GetDevice(IntPtr handle)
+        private Device GetDevice(IntPtr handle)
         {
             long hardware_id = handle.ToInt64();
             bool is_device_known = false;
@@ -760,14 +746,10 @@ namespace OpenTK.Platform.Windows
             }
         }
 
-        bool IsValid(int index)
+        private bool IsValid(int index)
         {
             return Devices.FromIndex(index) != null;
         }
-
-        #endregion
-
-        #region IJoystickDriver2 Members
 
         public JoystickState GetState(int index)
         {
@@ -828,7 +810,5 @@ namespace OpenTK.Platform.Windows
                 return new Guid();
             }
         }
-
-        #endregion
     }
 }

@@ -1,4 +1,3 @@
-#region License
 //
 // The Open Toolkit Library License
 //
@@ -6,7 +5,7 @@
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights to 
+// in the Software without restriction, including without limitation the rights to
 // use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 // the Software, and to permit persons to whom the Software is furnished to do
 // so, subject to the following conditions:
@@ -23,7 +22,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 //
-#endregion
 
 using System;
 using System.Collections.Generic;
@@ -32,13 +30,13 @@ using OpenTK.Input;
 
 namespace OpenTK.Platform.SDL2
 {
-    class Sdl2JoystickDriver : IJoystickDriver2, IGamePadDriver, IDisposable
+    internal class Sdl2JoystickDriver : IJoystickDriver2, IGamePadDriver, IDisposable
     {
-        const float RangeMultiplier =  1.0f / 32768.0f;
-        readonly MappedGamePadDriver gamepad_driver = new MappedGamePadDriver();
-        bool disposed;
+        private const float RangeMultiplier =  1.0f / 32768.0f;
+        private readonly MappedGamePadDriver gamepad_driver = new MappedGamePadDriver();
+        private bool disposed;
 
-        class Sdl2JoystickDetails
+        private class Sdl2JoystickDetails
         {
             public IntPtr Handle { get; set; }
             public Guid Guid { get; set; }
@@ -52,8 +50,9 @@ namespace OpenTK.Platform.SDL2
 
         // For IJoystickDriver2 implementation
         int last_joystick_instance = 0;
-        readonly List<JoystickDevice> joysticks = new List<JoystickDevice>(4);
-        readonly Dictionary<int, int> sdl_instanceid_to_joysticks = new Dictionary<int, int>();
+        private readonly List<JoystickDevice> joysticks = new List<JoystickDevice>(4);
+
+        private readonly Dictionary<int, int> sdl_instanceid_to_joysticks = new Dictionary<int, int>();
 
 #if USE_SDL2_GAMECONTROLLER
         class Sdl2GamePad
@@ -77,9 +76,7 @@ namespace OpenTK.Platform.SDL2
         {
         }
 
-        #region Private Members
-
-        JoystickDevice<Sdl2JoystickDetails> OpenJoystick(int id)
+        private JoystickDevice<Sdl2JoystickDetails> OpenJoystick(int id)
         {
             JoystickDevice<Sdl2JoystickDetails> joystick = null;
             int num_axes = 0;
@@ -115,41 +112,57 @@ namespace OpenTK.Platform.SDL2
             return joystick;
         }
 
-        bool IsJoystickValid(int id)
+        private bool IsJoystickValid(int id)
         {
             return id >= 0 && id < joysticks.Count;
         }
 
-        bool IsJoystickInstanceValid(int instance_id)
+        private bool IsJoystickInstanceValid(int instance_id)
         {
             return sdl_instanceid_to_joysticks.ContainsKey(instance_id);
         }
 
-        OpenTK.Input.HatPosition TranslateHat(HatPosition value)
+        private OpenTK.Input.HatPosition TranslateHat(HatPosition value)
         {
             if ((value & HatPosition.LeftUp) == HatPosition.LeftUp)
+            {
                 return OpenTK.Input.HatPosition.UpLeft;
+            }
 
             if ((value & HatPosition.RightUp) == HatPosition.RightUp)
+            {
                 return OpenTK.Input.HatPosition.UpRight;
+            }
 
             if ((value & HatPosition.LeftDown) == HatPosition.LeftDown)
+            {
                 return OpenTK.Input.HatPosition.DownLeft;
+            }
 
             if ((value & HatPosition.RightDown) == HatPosition.RightDown)
+            {
                 return OpenTK.Input.HatPosition.DownRight;
+            }
 
             if ((value & HatPosition.Up) == HatPosition.Up)
+            {
                 return OpenTK.Input.HatPosition.Up;
+            }
 
             if ((value & HatPosition.Right) == HatPosition.Right)
+            {
                 return OpenTK.Input.HatPosition.Right;
+            }
 
             if ((value & HatPosition.Down) == HatPosition.Down)
+            {
                 return OpenTK.Input.HatPosition.Down;
+            }
 
             if ((value & HatPosition.Left) == HatPosition.Left)
+            {
                 return OpenTK.Input.HatPosition.Left;
+            }
 
             return OpenTK.Input.HatPosition.Centered;
         }
@@ -218,7 +231,7 @@ namespace OpenTK.Platform.SDL2
             {
                 case GameControllerAxis.LeftX:
                     return GamePadAxes.LeftX;
-                
+
                 case GameControllerAxis.LeftY:
                     return GamePadAxes.LeftY;
 
@@ -295,10 +308,6 @@ namespace OpenTK.Platform.SDL2
             }
         }
 #endif
-
-        #endregion
-
-        #region Public Members
 
         public void ProcessJoystickEvent(JoyDeviceEvent ev)
         {
@@ -542,10 +551,6 @@ namespace OpenTK.Platform.SDL2
         }
 #endif
 
-        #endregion
-
-        #region IGamePadDriver Members
-
 #if USE_SDL2_GAMECONTOLLER
         public GamePadCapabilities GetCapabilities(int index)
         {
@@ -590,10 +595,6 @@ namespace OpenTK.Platform.SDL2
             return false;
         }
 #endif
-
-        #endregion
-
-        #region IJoystickDriver2 Members
 
         JoystickState IJoystickDriver2.GetState(int index)
         {
@@ -654,11 +655,7 @@ namespace OpenTK.Platform.SDL2
             return guid;
         }
 
-        #endregion
-
-        #region IDisposable Members
-
-        void Dispose(bool manual)
+        private void Dispose(bool manual)
         {
             if (!disposed)
             {
@@ -693,8 +690,6 @@ namespace OpenTK.Platform.SDL2
         {
             Dispose(false);
         }
-
-        #endregion
     }
 }
 
