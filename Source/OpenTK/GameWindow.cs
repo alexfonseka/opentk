@@ -79,11 +79,6 @@ namespace OpenTK
 
         readonly Stopwatch watch = new Stopwatch();
 
-        #pragma warning disable 612,618
-        readonly IJoystickDriver LegacyJoystick =
-            Factory.Default.CreateLegacyJoystickDriver();
-        #pragma warning restore 612,618
-
 
         IGraphicsContext glContext;
 
@@ -578,51 +573,6 @@ namespace OpenTK
                 return isExiting;
             }
         }
-
-        #endregion
-
-        #region Joysticks
-
-        /// <summary>
-        /// Gets a readonly IList containing all available OpenTK.Input.JoystickDevices.
-        /// </summary>
-        [Obsolete("Use OpenTK.Input.Joystick and GamePad instead")]
-        public IList<JoystickDevice> Joysticks
-        {
-            get { return LegacyJoystick.Joysticks; }
-        }
-
-        #endregion
-
-        #region Keyboard
-
-        #pragma warning disable 0612
-
-        /// <summary>
-        /// Gets the primary Keyboard device, or null if no Keyboard exists.
-        /// </summary>
-        public KeyboardDevice Keyboard
-        {
-            get { return InputDriver.Keyboard.Count > 0 ? InputDriver.Keyboard[0] : null; }
-        }
-
-        #pragma warning restore 0612
-
-        #endregion
-
-        #region Mouse
-
-        #pragma warning disable 0612
-
-        /// <summary>
-        /// Gets the primary Mouse device, or null if no Mouse exists.
-        /// </summary>
-        public MouseDevice Mouse
-        {
-            get { return InputDriver.Mouse.Count > 0 ? InputDriver.Mouse[0] : null; }
-        }
-
-        #pragma warning restore 0612
 
         #endregion
 

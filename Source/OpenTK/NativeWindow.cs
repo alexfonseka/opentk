@@ -367,23 +367,6 @@ namespace OpenTK
 
         #endregion
 
-        #region InputDriver
-
-        /// <summary>
-        /// This property is deprecated.
-        /// </summary>
-        [Obsolete]
-        public IInputDriver InputDriver
-        {
-            get
-            {
-                EnsureUndisposed();
-                return implementation.InputDriver;
-            }
-        }
-
-        #endregion
-
         #region Location
 
         /// <summary>

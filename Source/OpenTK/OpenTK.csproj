@@ -782,7 +782,6 @@
     <Compile Include="Input\ConfigurationType.cs" />
     <Compile Include="Input\GamePadConfigurationSource.cs" />
     <Compile Include="Input\GamePadConfigurationItem.cs" />
-    <Compile Include="Platform\LegacyJoystickDriver.cs" />
     <Compile Include="Platform\PlatformFactoryBase.cs" />
     <Compile Include="Input\JoystickHat.cs" />
     <Compile Include="Input\HatPosition.cs" />
@@ -802,7 +801,6 @@
     <Compile Include="Platform\MacOS\Cocoa\NSOpenGLPixelFormatAttribute.cs" />
     <Compile Include="Platform\MacOS\Cocoa\NSOpenGLProfile.cs" />
     <Compile Include="Platform\MacOS\Cocoa\NSOpenGLContextParameter.cs" />
-    <Compile Include="Platform\LegacyInputDriver.cs" />
     <Compile Include="Platform\MacOS\Cocoa\NSEventType.cs" />
     <Compile Include="Platform\MacOS\Cocoa\NSEventModifierMask.cs" />
     <Compile Include="Platform\MacOS\Cocoa\NSTrackingAreaOptions.cs" />
@@ -891,8 +889,5 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Platform\Linux\" />
-    <Folder Include="Platform\Linux\Bindings\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

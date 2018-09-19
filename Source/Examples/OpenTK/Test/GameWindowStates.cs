@@ -30,20 +30,10 @@ namespace Examples.Tests
 
         MouseCursor Pencil;
 
-        // legacy GameWindow.Mouse.* events
-        Vector4 mousedevice_pos;
-        int mousedevice_buttons;
-        MouseState mousedevice_state;
-
         // new GameWindow.Mouse* events
         Vector4 mouse_pos;
         int mouse_buttons;
         MouseState mouse_state;
-
-        // legacy GameWindow.Keyboard.Key* events
-        Dictionary<Key, int> legacy_keyboard_keys = new Dictionary<Key, int>();
-        KeyboardState legacy_keyboard_state;
-        KeyModifiers legacy_keyboard_modifiers;
 
         //new GameWindow.Key* events
         Dictionary<Key, int> keyboard_keys = new Dictionary<Key, int>();
@@ -70,20 +60,12 @@ namespace Examples.Tests
             : base(800, 600, GraphicsMode.Default)
         {
             VSync = VSyncMode.On;
-            Keyboard.KeyRepeat = false;
             KeyDown += KeyDownHandler;
             KeyUp += KeyUpHandler;
             KeyPress += KeyPressHandler;
-            Keyboard.KeyDown += KeyboardDeviceDownHandler;
-            Keyboard.KeyUp += KeyboardDeviceUpHandler;
 
             MouseEnter += delegate { mouse_in_window = true; };
             MouseLeave += delegate { mouse_in_window = false; };
-
-            Mouse.Move += MouseDeviceMoveHandler;
-            Mouse.WheelChanged += MouseDeviceWheelHandler;
-            Mouse.ButtonDown += MouseDeviceButtonHandler;
-            Mouse.ButtonUp += MouseDeviceButtonHandler;
 
             MouseMove += MouseMoveHandler;
             MouseWheel += MouseWheelHandler;
@@ -159,79 +141,22 @@ namespace Examples.Tests
                     p = PointToScreen(p);
                     OpenTK.Input.Mouse.SetPosition(p.X, p.Y);
                     break;
-
-				case Key.R:
-					Keyboard.KeyRepeat = !Keyboard.KeyRepeat;
-					break;
             }
 
             if (!keyboard_keys.ContainsKey(e.Key))
             {
                 keyboard_keys.Add(e.Key, 0);
             }
-			keyboard_keys[e.Key] = keyboard_keys[e.Key] + 1;
+            keyboard_keys[e.Key] = keyboard_keys[e.Key] + 1;
             keyboard_modifiers = e.Modifiers;
             keyboard_state = e.Keyboard;
         }
 
         void KeyUpHandler(object sender, KeyboardKeyEventArgs e)
         {
-			keyboard_keys.Remove(e.Key);
-			keyboard_modifiers = e.Modifiers;
-			keyboard_state = e.Keyboard;
-        }
-
-        void KeyboardDeviceDownHandler(object sender, KeyboardKeyEventArgs e)
-        {
-            if (!legacy_keyboard_keys.ContainsKey(e.Key))
-            {
-                legacy_keyboard_keys.Add(e.Key, 0);
-            }
-			legacy_keyboard_keys[e.Key] = legacy_keyboard_keys[e.Key] + 1;
-            legacy_keyboard_modifiers = e.Modifiers;
-            legacy_keyboard_state = e.Keyboard;
-        }
-
-        void KeyboardDeviceUpHandler(object sender, KeyboardKeyEventArgs e)
-        {
-			legacy_keyboard_keys.Remove(e.Key);
-            legacy_keyboard_modifiers = e.Modifiers;
-            legacy_keyboard_state = e.Keyboard;
-        }
-
-        #endregion
-
-        #region MouseDevice events
-
-        void MouseDeviceMoveHandler(object sender, MouseMoveEventArgs e)
-        {
-            mousedevice_pos.X = e.X;
-            mousedevice_pos.Y = e.Y;
-            mousedevice_pos.Z = e.Mouse.Scroll.X;
-            mousedevice_pos.W = e.Mouse.Scroll.Y;
-            mousedevice_state = e.Mouse;
-        }
-
-        void MouseDeviceButtonHandler(object sender, MouseButtonEventArgs e)
-        {
-            if (e.IsPressed)
-            {
-                mousedevice_buttons |= 1 << (int)e.Button;
-                Cursor = Pencil;
-            }
-            else
-            {
-                mousedevice_buttons &= ~(1 << (int)e.Button);
-                Cursor = MouseCursor.Default;
-            }
-            mousedevice_state = e.Mouse;
-        }
-
-        void MouseDeviceWheelHandler(object sender, MouseWheelEventArgs e)
-        {
-            mousedevice_pos.Z = e.Mouse.Scroll.X;
-            mousedevice_pos.W = e.Mouse.Scroll.Y;
-            mousedevice_state = e.Mouse;
+            keyboard_keys.Remove(e.Key);
+            keyboard_modifiers = e.Modifiers;
+            keyboard_state = e.Keyboard;
         }
 
         #endregion
@@ -334,148 +259,7 @@ namespace Examples.Tests
             }
             return line;
         }
-
-        int DrawKeyboardDevice(Graphics gfx, int line)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("KeyboardDevice: ");
-            for (Key key = 0; key < Key.LastKey; key++)
-            {
-                if (Keyboard[key])
-                {
-                    sb.Append(key);
-                    sb.Append(" ");
-                }
-            }
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("KeyboardDevice events: [");
-            sb.Append(legacy_keyboard_modifiers);
-            sb.Append("] ");
-            foreach (var pair in legacy_keyboard_keys)
-            {
-                sb.Append(pair.Key);
-                sb.Append(":");
-                sb.Append(pair.Value);
-                sb.Append(" ");
-            }
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("KeyboardDevice state: ");
-            KeyboardStateToString(legacy_keyboard_state, sb);
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("Keyboard events: [");
-            sb.Append(keyboard_modifiers);
-            sb.Append("] ");
-            foreach (var pair in keyboard_keys)
-            {
-                sb.Append(pair.Key);
-                sb.Append(":");
-                sb.Append(pair.Value);
-                sb.Append(" ");
-            }
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("Keyboard state: ");
-            KeyboardStateToString(keyboard_state, sb);
-            DrawString(gfx, sb.ToString(), line++);
-
-            return line;
-        }
-
-        int DrawMouseDevice(Graphics gfx, int line)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("MouseDevice: ");
-            sb.AppendFormat("[{0}, {1}, {2:0.00}] ",
-                Mouse.X, Mouse.Y, Mouse.WheelPrecise);
-            for (var i = MouseButton.Left; i < MouseButton.LastButton; i++)
-            {
-                if (Mouse[i])
-                {
-                    sb.Append(i);
-                    sb.Append(" ");
-                }
-            }
-            sb.AppendLine();
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("MouseDevice events: ");
-            sb.AppendFormat("[{0}, {1}, {2:0.00}, {3:0.00}] ",
-                mousedevice_pos.X, mousedevice_pos.Y,
-                mousedevice_pos.Z, mousedevice_pos.W);
-            for (var i = MouseButton.Left; i < MouseButton.LastButton; i++)
-            {
-                if ((mousedevice_buttons & (1 << (int)i)) != 0)
-                {
-                    sb.Append(i);
-                    sb.Append(" ");
-                }
-            }
-            sb.Append(" ");
-            sb.AppendLine(mousedevice_state.ToString());
-            DrawString(gfx, sb.ToString(), line++);
-
-            sb.Remove(0, sb.Length);
-            sb.Append("Mouse events: ");
-            sb.AppendFormat("[{0}, {1}, {2:0.00}, {3:0.00}] ",
-                mouse_pos.X, mouse_pos.Y,
-                mouse_pos.Z, mouse_pos.W);
-            for (var i = MouseButton.Left; i < MouseButton.LastButton; i++)
-            {
-                if ((mouse_buttons & (1 << (int)i)) != 0)
-                {
-                    sb.Append(i);
-                    sb.Append(" ");
-                }
-            }
-            sb.Append(" ");
-            sb.AppendLine(mouse_state.ToString());
-            DrawString(gfx, sb.ToString(), line++);
-            return line;
-        }
-
-        static int DrawLegacyJoysticks(Graphics gfx, IList<JoystickDevice> joysticks, int line)
-        {
-            line++;
-            DrawString(gfx, "Legacy Joystick:", line++);
-
-            int joy_index = -1;
-            foreach (var joy in joysticks)
-            {
-                joy_index++;
-                if (!String.IsNullOrEmpty(joy.Description))
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(joy_index);
-                    sb.Append(": '");
-                    sb.Append(joy.Description);
-                    sb.Append("' ");
-
-                    for (int i = 0; i < joy.Axis.Count; i++)
-                    {
-                        sb.Append(joy.Axis[i]);
-                        sb.Append(" ");
-                    }
-
-                    for (int i = 0; i < joy.Button.Count; i++)
-                    {
-                        sb.Append(joy.Button[i]);
-                        sb.Append(" ");
-                    }
-                    DrawString(gfx, sb.ToString(), line++);
-                }
-            }
-
-            return line;
-        }
-
+        
         #endregion
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -509,9 +293,6 @@ namespace Examples.Tests
                     mouse_in_window ? "inside" : "outside",
                     CursorVisible ? "visible" : "hidden",
                     Focused ? "Focused" : "Not focused"), line++);
-
-                line = DrawKeyboardDevice(gfx, line);
-                line = DrawMouseDevice(gfx, line);
 
                 // Timing information
                 line++;
@@ -548,7 +329,6 @@ namespace Examples.Tests
                 line = DrawKeyboards(gfx, line);
                 line = DrawMice(gfx, line);
                 line = DrawJoysticks(gfx, line);
-                line = DrawLegacyJoysticks(gfx, Joysticks, line);
             }
 
             fixed_update_timestep_pos += TargetUpdatePeriod;

@@ -129,12 +129,6 @@ namespace OpenTK
         Size ClientSize { get; set; }
 
         /// <summary>
-        /// This property is deprecated and should not be used.
-        /// </summary>
-        [Obsolete("Use OpenTK.Input.Mouse/Keyboard/Joystick/GamePad instead.")]
-        OpenTK.Input.IInputDriver InputDriver { get; }
-
-        /// <summary>
         /// Gets or sets the <see cref="OpenTK.MouseCursor"/> for this window.
         /// </summary>
         /// <value>The cursor.</value>
