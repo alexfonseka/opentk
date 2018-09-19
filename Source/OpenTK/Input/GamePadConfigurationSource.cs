@@ -1,4 +1,3 @@
-#region License
 //
 // GamePadConfigurationItem.cs
 //
@@ -25,15 +24,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#endregion
-
-using System;
 
 namespace OpenTK.Input
 {
-    struct GamePadConfigurationSource
+    internal struct GamePadConfigurationSource
     {
-        ConfigurationType map_type;
         JoystickButton? map_button;
         JoystickAxis? map_axis;
         JoystickHat? map_hat;
@@ -53,6 +48,11 @@ namespace OpenTK.Input
             Button = button;
         }
 
+        /// <summary>
+        /// Creates a new gamepad configuration source from a hat
+        /// </summary>
+        /// <param name="hat">The hat</param>
+        /// <param name="pos">The starting hat position</param>
         public GamePadConfigurationSource(JoystickHat hat, HatPosition pos)
             : this()
         {
@@ -61,11 +61,7 @@ namespace OpenTK.Input
             map_hat_position = pos;
         }
 
-        public ConfigurationType Type
-        {
-            get { return map_type; }
-            private set { map_type = value; }
-        }
+        public ConfigurationType Type { get; private set; }
 
         public JoystickAxis Axis
         {
@@ -79,12 +75,18 @@ namespace OpenTK.Input
             private set { map_button = value; }
         }
 
+        /// <summary>
+        /// Represents a gamepad hat
+        /// </summary>
         public JoystickHat Hat
         {
             get { return map_hat.Value; }
             private set { map_hat = value; }
         }
 
+        /// <summary>
+        /// Represents the position of a gamepad hat
+        /// </summary>
         public HatPosition HatPosition
         {
             get { return map_hat_position.Value; }

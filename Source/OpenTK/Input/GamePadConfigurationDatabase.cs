@@ -1,4 +1,3 @@
-#region License
 //
 // GamePadConfigurationDatabase.cs
 //
@@ -25,24 +24,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#endregion
 
 using System;
 using System.Collections.Generic;
 
 namespace OpenTK.Input
 {
-    class GamePadConfigurationDatabase
+    internal class GamePadConfigurationDatabase
     {
         internal const string UnmappedName = "Unmapped Controller";
 
-        readonly Dictionary<Guid, string> Configurations = new Dictionary<Guid, string>();
+        private readonly Dictionary<Guid, string> Configurations = new Dictionary<Guid, string>();
 
         internal GamePadConfigurationDatabase()
         {
             // Configuration database copied from SDL
-
-            #region License
             // Simple DirectMedia Layer
             // Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
             //
@@ -61,8 +57,6 @@ namespace OpenTK.Input
             // 2. Altered source versions must be plainly marked as such, and must not be
             // misrepresented as being the original software.
             // 3. This notice may not be removed or altered from any source distribution.
-            #endregion
-
             // Default (unknown) configuration
             if (!Configuration.RunningOnSdl2)
             {
