@@ -143,10 +143,19 @@ namespace OpenTK.Input
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < MaxAxes; i++)
+            int lastNonZeroAxis = -1;
+            for (int i = MaxAxes - 1; i >= 0; i--)
+            {
+                if (GetAxis(i) != 0)
+                {
+                    lastNonZeroAxis = i;
+                    break;
+                }
+            }
+            for (int i = 0; i <= lastNonZeroAxis; i++)
             {
                 sb.Append(" ");
-                sb.Append(String.Format("{0:f4}", GetAxis(i)));
+                sb.Append(String.Format("{0:F}", GetAxis(i)));
             }
             return String.Format(
                 "{{Axes:{0}; Buttons: {1}; Hat: {2}; IsConnected: {3}}}",

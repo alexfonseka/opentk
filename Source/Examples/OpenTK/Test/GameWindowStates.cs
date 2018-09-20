@@ -73,17 +73,14 @@ namespace Examples.Tests
             MouseUp += MouseButtonHandler;
         }
 
-        #region Keyboard Events
-
-        void KeyPressHandler(object sender, KeyPressEventArgs e)
+        private void KeyPressHandler(object sender, KeyPressEventArgs e)
         {
             if (TypedText.Length > 32)
                 TypedText.Remove(0, 1);
 
             TypedText.Append(e.KeyChar);
         }
-
-        void KeyDownHandler(object sender, KeyboardKeyEventArgs e)
+        private void KeyDownHandler(object sender, KeyboardKeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -151,19 +148,14 @@ namespace Examples.Tests
             keyboard_modifiers = e.Modifiers;
             keyboard_state = e.Keyboard;
         }
-
-        void KeyUpHandler(object sender, KeyboardKeyEventArgs e)
+        private void KeyUpHandler(object sender, KeyboardKeyEventArgs e)
         {
             keyboard_keys.Remove(e.Key);
             keyboard_modifiers = e.Modifiers;
             keyboard_state = e.Keyboard;
         }
 
-        #endregion
-
-        #region Mouse events
-
-        void MouseMoveHandler(object sender, MouseMoveEventArgs e)
+        private void MouseMoveHandler(object sender, MouseMoveEventArgs e)
         {
             mouse_pos.X = e.X;
             mouse_pos.Y = e.Y;
@@ -171,8 +163,7 @@ namespace Examples.Tests
             mouse_pos.W = e.Mouse.Scroll.Y;
             mouse_state = e.Mouse;
         }
-
-        void MouseButtonHandler(object sender, MouseButtonEventArgs e)
+        private void MouseButtonHandler(object sender, MouseButtonEventArgs e)
         {
             if (e.IsPressed)
             {
@@ -184,83 +175,12 @@ namespace Examples.Tests
             }
             mouse_state = e.Mouse;
         }
-
-        void MouseWheelHandler(object sender, MouseWheelEventArgs e)
+        private void MouseWheelHandler(object sender, MouseWheelEventArgs e)
         {
             mouse_pos.Z = e.Mouse.Scroll.X;
             mouse_pos.W = e.Mouse.Scroll.Y;
             mouse_state = e.Mouse;
         }
-
-        #endregion
-
-        #region Private Members
-
-        static int Clamp(int val, int min, int max)
-        {
-            return val > max ? max : val < min ? min : val;
-        }
-
-        static float DrawString(Graphics gfx, string str, int line)
-        {
-            return DrawString(gfx, str, line, 0);
-        }
-
-        static float DrawString(Graphics gfx, string str, int line, float offset)
-        {
-            gfx.DrawString(str, TextFont, Brushes.White, new PointF(offset, line * TextFont.Height));
-            return offset + gfx.MeasureString(str, TextFont).Width;
-        }
-
-        static void KeyboardStateToString(KeyboardState state, StringBuilder sb)
-        {
-            for (int key_index = 0; key_index < (int)Key.LastKey; key_index++)
-            {
-                Key k = (Key)key_index;
-                if (state[k])
-                {
-                    sb.Append(k);
-                    sb.Append(" ");
-                }
-            }
-        }
-
-        int DrawKeyboards(Graphics gfx, int line)
-        {
-            line++;
-            DrawString(gfx, "Keyboard:", line++);
-            for (int i = 0; i < 4; i++)
-            {
-                var state = OpenTK.Input.Keyboard.GetState(i);
-                if (state.IsConnected)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(i);
-                    sb.Append(": ");
-                    KeyboardStateToString(state, sb);
-                    DrawString(gfx, sb.ToString(), line++);
-                }
-            }
-            return line;
-        }
-
-        static int DrawMice(Graphics gfx, int line)
-        {
-            line++;
-            DrawString(gfx, String.Format("Cursor: {0}", OpenTK.Input.Mouse.GetCursorState()), line++);
-            DrawString(gfx, "Mouse:", line++);
-            for (int i = 0; i < 4; i++)
-            {
-                var state = OpenTK.Input.Mouse.GetState(i);
-                if (state.IsConnected)
-                {
-                    DrawString(gfx, state.ToString(), line++);
-                }
-            }
-            return line;
-        }
-        
-        #endregion
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
@@ -293,6 +213,9 @@ namespace Examples.Tests
                     mouse_in_window ? "inside" : "outside",
                     CursorVisible ? "visible" : "hidden",
                     Focused ? "Focused" : "Not focused"), line++);
+                DrawString(gfx, String.Format("Mouse State: {0}",
+                    mouse_state), line++);
+                DrawString(gfx, String.Format("Text: {0}", TypedText.ToString()), line++);
 
                 // Timing information
                 line++;
@@ -313,7 +236,6 @@ namespace Examples.Tests
                     UpdateTime, RenderTime), line++);
                 DrawString(gfx, String.Format("Drift: clock {0:f4}; update {1:f4}; render {2:f4}",
                     clock_time, clock_time - update_time, clock_time - render_time), line++);
-                DrawString(gfx, String.Format("Text: {0}", TypedText.ToString()), line++);
 
                 if (timestamp >= 1)
                 {
@@ -338,36 +260,28 @@ namespace Examples.Tests
             if (variable_update_timestep_pos >= 1)
                 variable_update_timestep_pos -= 2;
         }
-
-        int DrawJoysticks(Graphics gfx, int line)
+        protected override void OnRenderFrame(FrameEventArgs e)
         {
-            line++;
-            DrawString(gfx, "GamePad:", line++);
-            for (int i = 0; i < 4; i++)
+            render_time += e.Time;
+            render_count++;
+
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            if (viewport_changed)
             {
-                GamePadCapabilities caps = GamePad.GetCapabilities(i);
-                GamePadState state = GamePad.GetState(i);
-                if (state.IsConnected)
-                {
-                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
-                    DrawString(gfx, state.ToString(), line++);
-                }
+                viewport_changed = false;
+                GL.Viewport(0, 0, Width, Height);
             }
 
-            line++;
-            DrawString(gfx, "Joystick:", line++);
-            for (int i = 0; i < 4; i++)
-            {
-                JoystickCapabilities caps = Joystick.GetCapabilities(i);
-                JoystickState state = Joystick.GetState(i);
-                if (state.IsConnected)
-                {
-                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
-                    DrawString(gfx, state.ToString(), line++);
-                }
-            }
+            DrawText();
 
-            return line;
+            DrawMovingObjects();
+
+            variable_refresh_timestep_pos += e.Time;
+            if (variable_refresh_timestep_pos >= 1)
+                variable_refresh_timestep_pos -= 2;
+
+            SwapBuffers();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -398,35 +312,10 @@ namespace Examples.Tests
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
         }
-
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
             viewport_changed = true;
-        }
-
-        protected override void OnRenderFrame(FrameEventArgs e)
-        {
-            render_time += e.Time;
-            render_count++;
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            if (viewport_changed)
-            {
-                viewport_changed = false;
-                GL.Viewport(0, 0, Width, Height);
-            }
-
-            DrawText();
-
-            DrawMovingObjects();
-
-            variable_refresh_timestep_pos += e.Time;
-            if (variable_refresh_timestep_pos >= 1)
-                variable_refresh_timestep_pos -= 2;
-
-            SwapBuffers();
         }
 
         // Uploads our text Bitmap to an OpenGL texture
@@ -456,6 +345,15 @@ namespace Examples.Tests
             GL.End();
             GL.Disable(EnableCap.Texture2D);
         }
+        private void DrawRectangle()
+        {
+            GL.Begin(PrimitiveType.Quads);
+            GL.Vertex2(-0.05, -0.05);
+            GL.Vertex2(+0.05, -0.05);
+            GL.Vertex2(+0.05, +0.05);
+            GL.Vertex2(-0.05, +0.05);
+            GL.End();
+        }
 
         // Draws three moving objects, using three different timing methods:
         // 1. fixed framerate based on TargetUpdatePeriod
@@ -464,7 +362,7 @@ namespace Examples.Tests
         // If the timing implementation is correct, all three objects
         // should be moving at the same speed, regardless of the current
         // UpdatePeriod and RenderPeriod.
-        void DrawMovingObjects()
+        private void DrawMovingObjects()
         {
             Matrix4 thing_projection = Matrix4.CreateOrthographic(2, 2, -1, 1);
             GL.MatrixMode(MatrixMode.Projection);
@@ -489,14 +387,98 @@ namespace Examples.Tests
             DrawRectangle();
         }
 
-        private void DrawRectangle()
+
+        private static int Clamp(int val, int min, int max)
         {
-            GL.Begin(PrimitiveType.Quads);
-            GL.Vertex2(-0.05, -0.05);
-            GL.Vertex2(+0.05, -0.05);
-            GL.Vertex2(+0.05, +0.05);
-            GL.Vertex2(-0.05, +0.05);
-            GL.End();
+            return val > max ? max : val < min ? min : val;
+        }
+
+        private static float DrawString(Graphics gfx, string str, int line)
+        {
+            return DrawString(gfx, str, line, 0);
+        }
+        private static float DrawString(Graphics gfx, string str, int line, float offset)
+        {
+            gfx.DrawString(str, TextFont, Brushes.White, new PointF(offset, line * TextFont.Height));
+            return offset + gfx.MeasureString(str, TextFont).Width;
+        }
+
+        private static void KeyboardStateToString(KeyboardState state, StringBuilder sb)
+        {
+            for (int key_index = 0; key_index < (int)Key.LastKey; key_index++)
+            {
+                Key k = (Key)key_index;
+                if (state[k])
+                {
+                    sb.Append(k);
+                    sb.Append(" ");
+                }
+            }
+        }
+
+        private static int DrawKeyboards(Graphics gfx, int line)
+        {
+            line++;
+            DrawString(gfx, "Keyboard:", line++);
+            for (int i = 0; i < 4; i++)
+            {
+                var state = OpenTK.Input.Keyboard.GetState(i);
+                if (state.IsConnected)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(i);
+                    sb.Append(": ");
+                    KeyboardStateToString(state, sb);
+                    DrawString(gfx, sb.ToString(), line++);
+                }
+            }
+            return line;
+        }
+        private static int DrawMice(Graphics gfx, int line)
+        {
+            line++;
+            MouseState cursorState = Mouse.GetCursorState();
+            DrawString(gfx, String.Format("Cursor: {0}", cursorState), line++);
+            DrawString(gfx, "Mouse:", line++);
+            for (int i = 0; i < 4; i++)
+            {
+                var state = OpenTK.Input.Mouse.GetState(i);
+                if (state.IsConnected)
+                {
+                    DrawString(gfx, state.ToString(), line++);
+                }
+            }
+            return line;
+        }
+        private static int DrawJoysticks(Graphics gfx, int line)
+        {
+            line++;
+            DrawString(gfx, "GamePad:", line++);
+            for (int i = 0; i < 4; i++)
+            {
+                GamePadCapabilities caps = GamePad.GetCapabilities(i);
+                GamePadState state = GamePad.GetState(i);
+                if (state.IsConnected)
+                {
+                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
+                    DrawString(gfx, state.ToString(), line++);
+                }
+            }
+
+            line++;
+            DrawString(gfx, "Joystick:", line++);
+            for (int i = 0; i < 4; i++)
+            {
+                JoystickCapabilities caps = Joystick.GetCapabilities(i);
+                JoystickState state = Joystick.GetState(i);
+                if (state.IsConnected)
+                {
+                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
+                    DrawString(gfx, state.ToString(), line++);
+                }
+            }
+
+            return line;
         }
 
         public static void Main()
