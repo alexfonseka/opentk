@@ -460,7 +460,8 @@ namespace Examples.Tests
                 GamePadState state = GamePad.GetState(i);
                 if (state.IsConnected)
                 {
-                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
+                    DrawString(gfx, String.Format("[{0}] {1} ({2})", i, Joystick.GetGuid(i), GamePad.GetName(i)), line++);
+                    DrawString(gfx, String.Format("{0}", caps), line++);
                     DrawString(gfx, state.ToString(), line++);
                 }
             }
@@ -473,7 +474,8 @@ namespace Examples.Tests
                 JoystickState state = Joystick.GetState(i);
                 if (state.IsConnected)
                 {
-                    DrawString(gfx, String.Format("{0}: {1}", i, caps), line++);
+                    DrawString(gfx, String.Format("[{0}] {1}", i, Joystick.GetGuid(i)), line++);
+                    DrawString(gfx, String.Format("{0}", caps), line++);
                     DrawString(gfx, state.ToString(), line++);
                 }
             }
