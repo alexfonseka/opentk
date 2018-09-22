@@ -1723,16 +1723,5 @@ namespace OpenTK.Platform.SDL2
         public Int32 Data1;
         public Int32 Data2;
     }
-
-    /// <summary>
-    /// Drop event for SDL2 interop. For detailed info look: https://wiki.libsdl.org/SDL_DropEvent
-    /// </summary>
-    internal struct DropEvent
-    {
-        public UInt32 Type;
-        public UInt32 Timestamp;
-        public IntPtr File;
-        public UInt32 WindowID;
-    }
 }
 
