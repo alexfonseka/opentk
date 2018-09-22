@@ -164,13 +164,24 @@ namespace OpenTK.Input
                 return new GamePadConfigurationSource();
             }
 
+            // Parse the optional modifier
+            GamePadConfigurationModifier modifier = GamePadConfigurationModifier.None;
+            switch (item[0])
+            {
+                case '+': modifier = GamePadConfigurationModifier.PositiveRange; break;
+                case '-': modifier = GamePadConfigurationModifier.NegativeRange; break;
+                case '~': modifier = GamePadConfigurationModifier.Inverted; break;
+            }
+            if (modifier != GamePadConfigurationModifier.None)
+                item = item.Remove(0, 1);
+
             switch (item[0])
             {
                 case 'a':
-                    return new GamePadConfigurationSource(isAxis:true, index:ParseIndex(item));
+                    return new GamePadConfigurationSource(true, ParseIndex(item), modifier);
 
                 case 'b':
-                    return new GamePadConfigurationSource(isAxis:false, index:ParseIndex(item));
+                    return new GamePadConfigurationSource(false, ParseIndex(item), modifier);
 
                 case 'h':
                     {

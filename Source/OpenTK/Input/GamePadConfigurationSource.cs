@@ -33,24 +33,28 @@ namespace OpenTK.Input
         private int? map_axis;
         private JoystickHat? map_hat;
         private HatPosition? map_hat_position;
+        private GamePadConfigurationModifier map_modifier;
 
         /// <summary>
         /// Creates a new gamepad configuration source from an axis or a button
         /// </summary>
         /// <param name="isAxis">Whether this source is an axis or a button</param>
         /// <param name="index">The index of this source</param>
-        public GamePadConfigurationSource(bool isAxis, int index)
+        /// <param name="modifier">The modifier to apply to the source data</param>
+        public GamePadConfigurationSource(bool isAxis, int index, GamePadConfigurationModifier modifier)
             : this()
         {
             if (isAxis)
             {
                 Type = ConfigurationType.Axis;
                 Axis = index;
+                Modifier = modifier;
             }
             else
             {
                 Type = ConfigurationType.Button;
                 Button = index;
+                Modifier = modifier;
             }
         }
 
@@ -64,10 +68,19 @@ namespace OpenTK.Input
         {
             Type = ConfigurationType.Hat;
             Hat = hat;
-            map_hat_position = pos;
+            HatPosition = pos;
         }
 
         public ConfigurationType Type { get; private set; }
+
+        /// <summary>
+        /// A modifier of the source joystick input before mapping it to the target gamepad input.
+        /// </summary>
+        public GamePadConfigurationModifier Modifier
+        {
+            get { return map_modifier; }
+            private set { map_modifier = value; }
+        }
 
         /// <summary>
         /// Represents a gamepad axis

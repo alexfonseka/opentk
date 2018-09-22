@@ -1,5 +1,5 @@
 //
-// GamePadConfigurationTarget.cs
+// GamePadConfigurationItem.cs
 //
 // Author:
 //       Stefanos A. <stapostol@gmail.com>
@@ -25,41 +25,13 @@
 // THE SOFTWARE.
 //
 
-using System;
-
 namespace OpenTK.Input
 {
-    internal struct GamePadConfigurationTarget
+    internal enum GamePadConfigurationModifier
     {
-        private Buttons? map_button;
-        private GamePadAxes? map_axis;
-
-        public GamePadConfigurationTarget(Buttons button)
-            : this()
-        {
-            Type = ConfigurationType.Button;
-            map_button = button;
-        }
-
-        public GamePadConfigurationTarget(GamePadAxes axis)
-            : this()
-        {
-            Type = ConfigurationType.Axis;
-            map_axis = axis;
-        }
-
-        public ConfigurationType Type { get; private set; }
-
-        public GamePadAxes Axis
-        {
-            get { return map_axis.Value; }
-            private set { map_axis = value; }
-        }
-
-        public Buttons Button
-        {
-            get { return map_button.Value; }
-            private set { map_button = value; }
-        }
+        None,
+        PositiveRange,
+        NegativeRange,
+        Inverted
     }
 }

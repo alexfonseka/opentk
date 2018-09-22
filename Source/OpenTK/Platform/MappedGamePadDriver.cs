@@ -77,6 +77,20 @@ namespace OpenTK.Platform
                                 int source_axis = map.Source.Axis;
                                 short value = joy.GetAxisRaw(source_axis);
 
+                                // Apply modifier, if we have one
+                                switch (map.Source.Modifier)
+                                {
+                                    case GamePadConfigurationModifier.Inverted:
+                                        value = (short)~value;
+                                        break;
+                                    case GamePadConfigurationModifier.PositiveRange:
+                                        value = Math.Max(value, (short)0);
+                                        break;
+                                    case GamePadConfigurationModifier.NegativeRange:
+                                        value = (short)~Math.Min(value, (short)0);
+                                        break;
+                                }
+
                                 switch (map.Target.Type)
                                 {
                                     case ConfigurationType.Axis:
