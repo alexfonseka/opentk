@@ -125,6 +125,76 @@ namespace OpenTK.Input
                 }
             }
         }
+
+        /// <summary>
+        /// Generates an SDL 2.0.6 compatible joystick GUID from the specified device parameters.
+        /// </summary>
+        /// <param name="isBluetooth"></param>
+        /// <param name="productId"></param>
+        /// <param name="vendorId"></param>
+        /// <param name="versionNumber"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal static Guid CreateGuid(bool isBluetooth, uint productId, uint vendorId, uint versionNumber, string name)
+        {
+            const ushort BUS_USB = 0x03;
+            const ushort BUS_BLUETOOTH = 0x05;
+            ushort busType = isBluetooth ? BUS_BLUETOOTH : BUS_USB;
+            return CreateGuid(busType, productId, vendorId, versionNumber, name);
+        }
+        /// <summary>
+        /// Generates an SDL 2.0.6 compatible joystick GUID from the specified device parameters.
+        /// </summary>
+        /// <param name="busType"></param>
+        /// <param name="productId"></param>
+        /// <param name="vendorId"></param>
+        /// <param name="versionNumber"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal static Guid CreateGuid(uint busType, uint productId, uint vendorId, uint versionNumber, string name)
+        {
+            // Note: the first 8bytes of the Guid are byteswapped
+            // in three parts when using `new Guid(byte[])`:
+            // (int, short, short).
+            // We need to take that into account to match the expected
+            // Guid in the database. Ugh.
+            byte[] bytes = new byte[16];
+
+            int i = 0;
+            byte[] bus = BitConverter.GetBytes((int)busType);
+            bytes[i++] = bus[3];
+            bytes[i++] = bus[2];
+            bytes[i++] = bus[1];
+            bytes[i++] = bus[0];
+
+            if (vendorId != 0 && productId != 0)
+            {
+                byte[] vendor = BitConverter.GetBytes(vendorId);
+                byte[] product = BitConverter.GetBytes(productId);
+                byte[] version = BitConverter.GetBytes(versionNumber);
+                bytes[i++] = vendor[1];
+                bytes[i++] = vendor[0];
+                bytes[i++] = 0;
+                bytes[i++] = 0;
+                bytes[i++] = product[0]; // no byteswapping
+                bytes[i++] = product[1];
+                bytes[i++] = 0;
+                bytes[i++] = 0;
+                bytes[i++] = version[0]; // no byteswapping
+                bytes[i++] = version[1];
+                bytes[i++] = 0;
+                bytes[i++] = 0;
+            }
+            else if (name != null)
+            {
+                for (int j = 0; j < Math.Min(bytes.Length - i, name.Length); j++)
+                {
+                    bytes[i + j] = (byte)name[j];
+                }
+            }
+
+            return new Guid(bytes);
+        }
     }
 
     // Provides platform-specific information about the relevant JoystickDevice.

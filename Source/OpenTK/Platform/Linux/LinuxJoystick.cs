@@ -153,48 +153,12 @@ namespace OpenTK.Platform.Linux
 
         private Guid CreateGuid(EvdevInputId id, string name)
         {
-            // Note: the first 8bytes of the Guid are byteswapped
-            // in three parts when using `new Guid(byte[])`:
-            // (int, short, short).
-            // We need to take that into account to match the expected
-            // Guid in the database. Ugh.
-
-            byte[] bytes = new byte[16];
-
-            int i = 0;
-            byte[] bus = BitConverter.GetBytes((int)id.BusType);
-            bytes[i++] = bus[3];
-            bytes[i++] = bus[2];
-            bytes[i++] = bus[1];
-            bytes[i++] = bus[0];
-
-            if (id.Vendor != 0 && id.Product != 0 && id.Version != 0)
-            {
-                byte[] vendor = BitConverter.GetBytes(id.Vendor);
-                byte[] product = BitConverter.GetBytes(id.Product);
-                byte[] version = BitConverter.GetBytes(id.Version);
-                bytes[i++] = vendor[1];
-                bytes[i++] = vendor[0];
-                bytes[i++] = 0;
-                bytes[i++] = 0;
-                bytes[i++] = product[0]; // no byteswapping
-                bytes[i++] = product[1];
-                bytes[i++] = 0;
-                bytes[i++] = 0;
-                bytes[i++] = version[0]; // no byteswapping
-                bytes[i++] = version[1];
-                bytes[i++] = 0;
-                bytes[i++] = 0;
-            }
-            else
-            {
-                for (int j = 0; j < bytes.Length - i; j++)
-                {
-                    bytes[i + j] = (byte)name[j];
-                }
-            }
-
-            return new Guid(bytes);
+            return JoystickDevice.CreateGuid(
+                id.BusType,
+                id.Product,
+                id.Vendor,
+                id.Version,
+                name);
         }
 
         private unsafe static bool TestBit(byte* ptr, int bit)

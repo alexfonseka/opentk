@@ -703,11 +703,10 @@ namespace OpenTK.Platform.Windows
             return true;
         }
 
-        // Get a DirectInput-compatible Guid
-        // (equivalent to DIDEVICEINSTANCE guidProduct field)
+        // Get an SDL 2.0.6 compatible joystick Guid
         private Guid GetDeviceGuid(IntPtr handle)
         {
-            // Retrieve a RID_DEVICE_INFO struct which contains the VID and PID
+            // Retrieve a RID_DEVICE_INFO struct which contains the vendor and product IDs
             RawInputDeviceInfo info = new RawInputDeviceInfo();
             int size = info.Size;
             if (Functions.GetRawInputDeviceInfo(handle, RawInputDeviceInfoEnum.DEVICEINFO, info, ref size) < 0)
@@ -717,19 +716,18 @@ namespace OpenTK.Platform.Windows
                 return Guid.Empty;
             }
 
-            // Todo: this Guid format is only valid for USB joysticks.
-            // Bluetooth devices, such as OUYA controllers, have a totally
-            // different PID/VID format in DirectInput.
-            // Do we need to use the same guid or could we simply use PID/VID
-            // there too? (Test with an OUYA controller.)
-            int vid = info.Device.HID.VendorId;
-            int pid = info.Device.HID.ProductId;
-            return new Guid(
-                (pid << 16) | vid,
-                0, 0,
-                0, 0,
-                (byte)'P', (byte)'I', (byte)'D',
-                (byte)'V', (byte)'I', (byte)'D');
+            //
+            // For more info on the GUID implementation in SDL 2.0.6, see here:
+            // https://github.com/spurious/SDL-mirror/commit/6fcf21b827925a2df0f781b14778a64bcef532f7#diff-a722c387ed0f81f40775f1f3a7c95121
+            //
+
+            // ToDo: Find a way to check for bluetooth or USB
+            return JoystickDevice.CreateGuid(
+                false,
+                (uint)info.Device.HID.ProductId,
+                (uint)info.Device.HID.VendorId,
+                (uint)info.Device.HID.VersionNumber,
+                null);
         }
 
         // Checks whether this is an XInput device.

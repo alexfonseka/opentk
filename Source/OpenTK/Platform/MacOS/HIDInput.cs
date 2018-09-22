@@ -570,53 +570,26 @@ namespace OpenTK.Platform.MacOS
         private Guid CreateJoystickGuid(IntPtr device, string name)
         {
             // Create a device guid from the product and vendor id keys
-            List<byte> guid_bytes = new List<byte>();
             long vendor_id = 0;
             long product_id = 0;
+            long version_number = 0;
 
             IntPtr vendor_id_ref = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDVendorIDKey);
             IntPtr product_id_ref = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDProductIDKey);
+            IntPtr version_number_ref = NativeMethods.IOHIDDeviceGetProperty(device, NativeMethods.IOHIDVersionNumberKey);
             if (vendor_id_ref != IntPtr.Zero)
-            {
                 CF.CFNumberGetValue(vendor_id_ref, CF.CFNumberType.kCFNumberLongType, out vendor_id);
-            }
             if (product_id_ref != IntPtr.Zero)
-            {
                 CF.CFNumberGetValue(product_id_ref, CF.CFNumberType.kCFNumberLongType, out product_id);
-            }
+            if (version_number_ref != IntPtr.Zero)
+                CF.CFNumberGetValue(version_number_ref, CF.CFNumberType.kCFNumberLongType, out version_number);
 
-            if (vendor_id != 0 && product_id != 0)
-            {
-                guid_bytes.AddRange(BitConverter.GetBytes(vendor_id));
-                guid_bytes.AddRange(BitConverter.GetBytes(product_id));
-            }
-            else
-            {
-                // Bluetooth devices don't have USB vendor/product id keys.
-                // Match SDL2 algorithm for compatibility.
-                guid_bytes.Add(0x05); // BUS_BLUETOOTH
-                guid_bytes.Add(0x00);
-                guid_bytes.Add(0x00);
-                guid_bytes.Add(0x00);
-
-                // Copy the first 12 bytes of the product name
-                byte[] name_bytes = new byte[12];
-                Array.Copy(System.Text.Encoding.UTF8.GetBytes(name), name_bytes, name_bytes.Length);
-                guid_bytes.AddRange(name_bytes);
-            }
-
-            // The Guid(byte[]) constructor performs byte-swapping on the first 4+2+2 bytes, while
-            // the Guid(string) constructor does not. Since our database is using the string
-            // constructor, we need to compensate for this difference or the database lookups
-            // will fail.
-            byte[] guid_array = guid_bytes.ToArray();
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(guid_array, 0, 4);
-                Array.Reverse(guid_array, 4, 2);
-                Array.Reverse(guid_array, 6, 2);
-            }
-            return new Guid(guid_array);
+            return JoystickDevice.CreateGuid(
+                (vendor_id != 0 && product_id != 0),
+                (uint)product_id,
+                (uint)vendor_id,
+                (uint)version_number,
+                name);
         }
 
         private JoystickData CreateJoystick(IntPtr sender, IntPtr device)
