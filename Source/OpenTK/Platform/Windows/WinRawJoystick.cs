@@ -39,25 +39,19 @@ namespace OpenTK.Platform.Windows
         private class Device
         {
             public IntPtr Handle;
-            private JoystickCapabilities Capabilities;
             private JoystickState State;
             private Guid Guid;
+            private bool connected;
 
-            internal readonly List<HidProtocolValueCaps> AxisCaps =
-                new List<HidProtocolValueCaps>();
-            internal readonly List<HidProtocolButtonCaps> ButtonCaps =
-                new List<HidProtocolButtonCaps>();
+            internal readonly List<HidProtocolValueCaps> AxisCaps = new List<HidProtocolValueCaps>();
+            internal readonly List<HidProtocolButtonCaps> ButtonCaps = new List<HidProtocolButtonCaps>();
             internal readonly bool IsXInput;
             internal readonly int XInputIndex;
 
-            private readonly Dictionary<int, int> axes =
-                new Dictionary<int, int>();
+            private readonly Dictionary<int, int> axes = new Dictionary<int, int>();
+            private readonly Dictionary<int, int> buttons = new Dictionary<int, int>();
+            private readonly Dictionary<int, JoystickHat> hats = new Dictionary<int, JoystickHat>();
 
-            private readonly Dictionary<int, int> buttons =
-                new Dictionary<int, int>();
-
-            private readonly Dictionary<int, JoystickHat> hats =
-                new Dictionary<int, JoystickHat>();
 
             public Device(IntPtr handle, Guid guid, bool is_xinput, int xinput_index)
             {
@@ -100,21 +94,17 @@ namespace OpenTK.Platform.Windows
 
             public void SetConnected(bool value)
             {
-                Capabilities.SetIsConnected(value);
+                connected = value;
                 State.SetIsConnected(value);
             }
 
             public JoystickCapabilities GetCapabilities()
             {
-                Capabilities = new JoystickCapabilities(
-                    axes.Count, buttons.Count, hats.Count,
-                    Capabilities.IsConnected);
-                return Capabilities;
-            }
-
-            internal void SetCapabilities(JoystickCapabilities caps)
-            {
-                Capabilities = caps;
+                return new JoystickCapabilities(
+                    axes.Count, 
+                    buttons.Count, 
+                    hats.Count,
+                    connected);
             }
 
             public Guid GetGuid()
