@@ -726,7 +726,8 @@ namespace OpenTK.Platform.Windows
                 false,
                 (uint)info.Device.HID.ProductId,
                 (uint)info.Device.HID.VendorId,
-                (uint)info.Device.HID.VersionNumber,
+                // SDL2 doesn't include the version number on Windows - not sure why, but replicate that anyway.
+                (uint)0, // (uint)info.Device.HID.VersionNumber,
                 null);
         }
 
