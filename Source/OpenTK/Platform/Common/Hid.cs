@@ -55,6 +55,17 @@ namespace OpenTK.Platform.Common
             return (int)(temp / (value_max - value_min) + result_min);
         }
 
+        /// <summary>
+        /// Translates a HID page and usage into an OpenTK axis offset. 
+        /// 
+        /// Note that this does not equal the actual axis index, but defines
+        /// a general axis ordering. The index will depend on which usages are
+        /// defined for a given device. HID devices may report the same usage
+        /// multiple times, and omit others entirely.
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="usage"></param>
+        /// <returns></returns>
         public static int TranslateJoystickAxis(HIDPage page, int usage)
         {
             switch (page)
