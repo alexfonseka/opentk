@@ -1,10 +1,5 @@
-:: search for msbuild (old C#) and make it available
-:: set bb.build.msbuild.exe=
-:: for /D %%D in (%SYSTEMROOT%\Microsoft.NET\Framework\v4*) do set msbuildPath=%%D
-:: set PATH=%PATH%;%msbuildPath%
-
-:: search for msbuild C# 6.0+ and make it available
-set msbuildPath=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
+:: search for msbuild make it available
+set msbuildPath=%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
 set PATH=%PATH%;%msbuildPath%
 
 :: make sure we have a clean release build

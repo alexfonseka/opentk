@@ -10,9 +10,9 @@
     <description>A custom version of OpenTK for being used with the Duality framework. Forked from https://github.com/opentk/opentk</description>
   </metadata>
   <files>
-    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll" target="lib" />
-    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll.config" target="lib" />
-    <file src="..\..\Binaries\OpenTK\Release\OpenTK.pdb" target="lib" />
-    <file src="..\..\Binaries\OpenTK\Release\OpenTK.xml" target="lib" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll" target="lib\net20" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.dll.config" target="lib\net20" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.pdb" target="lib\net20" />
+    <file src="..\..\Binaries\OpenTK\Release\OpenTK.xml" target="lib\net20" />
   </files>
 </package>
