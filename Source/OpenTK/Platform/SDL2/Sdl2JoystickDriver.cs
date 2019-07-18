@@ -594,7 +594,16 @@ namespace OpenTK.Platform.SDL2
 
         public bool SetVibration(int index, float left, float right)
         {
-            return false;
+            var device_id = sdl_instanceid_to_joysticks[index];
+            var joystick_device = (JoystickDevice< Sdl2JoystickDetails>)joysticks[device_id];
+
+            var res = SDL.JoystickRumble(
+                joystick_device.Details.Handle,
+                (ushort)(65535f * left), (ushort)(65535f * right),
+                1000000U
+                );
+
+            return res == 0;
         }
 #endif
 

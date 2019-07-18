@@ -92,5 +92,18 @@ namespace OpenTK.Input
         //{
         //    return implementation.GetName(index);
         //}
+
+
+        /// <summary>
+        /// Sets the vibration on the device.
+        /// </summary>
+        /// <param name="index">The zero-based index of the device to poll.</param>
+        /// <param name="left">The strength of the left or low frequency motor (0 to 1).</param>
+        /// <param name="right">The strength of the right or high frequency motor (0 to 1).</param>
+        /// <returns></returns>
+        public static bool SetVibration(int index, float left, float right)
+        {
+            return implementation.SetVibration(index, left, right);
+        }
     }
 }

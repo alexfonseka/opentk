@@ -1678,6 +1678,11 @@ namespace OpenTK.Platform.MacOS
             GC.SuppressFinalize(this);
         }
 
+        public bool SetVibration(int index, float left, float right)
+        {
+            return false;
+        }
+
         ~HIDInput()
         {
             Dispose(false);

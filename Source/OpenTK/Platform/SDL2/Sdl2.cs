@@ -37,13 +37,13 @@ namespace OpenTK.Platform.SDL2
 
     internal partial class SDL
     {
-        #if ANDROID
+#if ANDROID
         const string lib = "libSDL2.so";
-        #elif IPHONE
+#elif IPHONE
         const string lib = "__Internal";
-        #else
+#else
         private const string lib = "SDL2.dll";
-        #endif
+#endif
 
         public readonly static object Sync = new object();
         private static Nullable<Version> version;
@@ -335,6 +335,15 @@ namespace OpenTK.Platform.SDL2
         }
 
         [SuppressUnmanagedCodeSecurity]
+        [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickRumble", ExactSpelling = true)]
+        public static extern int JoystickRumble(
+            IntPtr joystick,
+            UInt16 low_frequency_rumble,
+            UInt16 high_frequency_rumble,
+            UInt32 duration_ms
+            );
+
+        [SuppressUnmanagedCodeSecurity]
         [DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_JoystickNumAxes", ExactSpelling = true)]
         public static extern int JoystickNumAxes(IntPtr joystick);
 
@@ -394,7 +403,7 @@ namespace OpenTK.Platform.SDL2
 
             unsafe
             {
-                fixed (Event *pe = e)
+                fixed (Event* pe = e)
                 {
                     return PeepEvents(pe, count, action, min, max);
                 }
@@ -1597,12 +1606,12 @@ namespace OpenTK.Platform.SDL2
         public enum EventType : uint
         {
             /* Touch events */
-            FingerDown      = 0x700,
+            FingerDown = 0x700,
             FingerUp,
             FingerMotion,
 
             /* Gesture events */
-            DollarGesture   = 0x800,
+            DollarGesture = 0x800,
             DollarRecord,
             MultiGesture,
         }

@@ -914,5 +914,10 @@ namespace OpenTK.Platform.Windows
                 return new Guid();
             }
         }
+
+        public bool SetVibration(int index, float left, float right)
+        {
+            return false;
+        }
     }
 }
